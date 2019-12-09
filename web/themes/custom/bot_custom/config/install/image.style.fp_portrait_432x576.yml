@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: fp_portrait_432x576
+label: 'FP Portrait (432x576)'
+effects:
+  9cd1500c-b867-4b16-ace2-dcaef77fbd28:
+    uuid: 9cd1500c-b867-4b16-ace2-dcaef77fbd28
+    id: focal_point_crop
+    weight: 1
+    data:
+      width: 433
+      height: 576
+      crop_type: portrait_crop

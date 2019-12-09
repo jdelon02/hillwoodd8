@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: fp_widescreen_992x558
+label: 'FP Widescreen (992x558)'
+effects:
+  03825139-ffa8-421f-8aae-d238d24dea8b:
+    uuid: 03825139-ffa8-421f-8aae-d238d24dea8b
+    id: focal_point_crop
+    weight: 1
+    data:
+      width: 992
+      height: 558
+      crop_type: widescreen_crop

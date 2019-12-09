@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+label: 'Landscape Crop'
+id: landscape_crop
+description: 'Meant for images that should be cropped and rendered in 4:3 ratio.'
+aspect_ratio: '4:3'
+soft_limit_width: null
+soft_limit_height: null
+hard_limit_width: 960
+hard_limit_height: 720

@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: fp_landscape_768x576
+label: 'FP Landscape (768x576)'
+effects:
+  9a30cc04-6251-4587-96d5-7af7265651c4:
+    uuid: 9a30cc04-6251-4587-96d5-7af7265651c4
+    id: focal_point_crop
+    weight: 1
+    data:
+      width: 768
+      height: 576
+      crop_type: landscape_crop

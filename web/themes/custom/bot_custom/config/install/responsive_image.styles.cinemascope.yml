@@ -1,0 +1,42 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.fp_cinemascope_1200x515
+    - image.style.fp_cinemascope_1920x823
+    - image.style.fp_cinemascope_768x329
+    - image.style.fp_cinemascope_992x425
+  theme:
+    - bot_custom
+_core:
+  default_config_hash: o5S-RQv7FNHd1mGPC_e_wDZ7KfyQYvVsljFvwo0JpWY
+id: cinemascope_21_9
+label: 'Cinemascope (21:9)'
+image_style_mappings:
+  -
+    breakpoint_id: bot_custom.screen-lg-min
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_cinemascope_1920x823
+  -
+    breakpoint_id: bot_custom.screen-md-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_cinemascope_1200x515
+  -
+    breakpoint_id: bot_custom.screen-md-min
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: ''
+  -
+    breakpoint_id: bot_custom.screen-sm-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_cinemascope_992x425
+  -
+    breakpoint_id: bot_custom.screen-xs-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_cinemascope_768x329
+breakpoint_group: bot_custom
+fallback_image_style: fp_cinemascope_768x329

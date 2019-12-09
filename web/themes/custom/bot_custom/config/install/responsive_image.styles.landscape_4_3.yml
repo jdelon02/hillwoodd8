@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.fp_landscape_1200x900
+    - image.style.fp_landscape_1920x1440
+    - image.style.fp_landscape_768x576
+    - image.style.fp_landscape_992x744
+  theme:
+    - bot_custom
+id: landscape_4_3
+label: 'Landscape (4:3)'
+image_style_mappings:
+  -
+    breakpoint_id: bot_custom.screen-lg-min
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_landscape_1920x1440
+  -
+    breakpoint_id: bot_custom.screen-md-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_landscape_1200x900
+  -
+    breakpoint_id: bot_custom.screen-sm-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_landscape_992x744
+  -
+    breakpoint_id: bot_custom.screen-xs-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_landscape_768x576
+breakpoint_group: bot_custom
+fallback_image_style: fp_landscape_768x576

@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: fp_square_256
+label: 'FP Square (256)'
+effects:
+  2a0b9331-da57-4ff1-bbef-08d5fbda4aa9:
+    uuid: 2a0b9331-da57-4ff1-bbef-08d5fbda4aa9
+    id: focal_point_crop
+    weight: 1
+    data:
+      width: 256
+      height: 256
+      crop_type: square_crop

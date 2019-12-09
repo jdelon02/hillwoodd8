@@ -1,0 +1,14 @@
+name: Bamboo Twig - Internationalization
+description: 'Several "i18n" Twig extensions.'
+package: Bamboo Twig
+type: module
+# core: 8.x
+
+dependencies:
+ - bamboo_twig:bamboo_twig
+
+# Information added by Drupal.org packaging script on 2018-08-25
+version: '8.x-4.1'
+core: '8.x'
+project: 'bamboo_twig'
+datestamp: 1535186887

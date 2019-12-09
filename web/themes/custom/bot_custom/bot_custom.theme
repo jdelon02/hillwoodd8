@@ -1,0 +1,23 @@
+<?php
+
+/**
+ * @file
+ * Bootstrap sub-theme.
+ *
+ * Place your custom PHP code in this file.
+ */
+
+/**
+ * Implements hook_theme_suggestions_page_alter().
+ */
+function bot_custom_theme_suggestions_page_alter(array &$suggestions, array $variables) {
+  if ($node = \Drupal::routeMatch()->getParameter('node')) {
+    $suggestions[] = 'page__' . $node->bundle();
+  }
+}
+
+
+function bot_custom_preprocess_clickable_media(&$variables) {
+$parentEntity = $variables['content']['field_media_image']['#object']->_referringItem->getEntity();
+$variables['parent_entity_url'] = \Drupal::service('path.alias_manager')->getAliasByPath($parentEntity->toUrl()->toString());
+}

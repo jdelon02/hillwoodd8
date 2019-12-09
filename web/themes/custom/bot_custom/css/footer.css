@@ -1,0 +1,63 @@
+/**
+ * If using a CSS pre-processor, tell it to overwrite this file. If not, place
+ * your custom CSS modifications here.
+ */
+
+/**********footer********/
+footer.footer {
+    margin: 5em auto 0;
+    text-align: center;
+    background:url(../images/footer-pattern.png) repeat;
+    width: 100% !important;
+    border: none;
+    padding: 5em 0;
+}
+footer.region-footer {
+    max-width: 95%;
+}
+.region-footer nav {
+    margin-bottom: 20px;
+}
+footer.footer nav ul {
+    display: flex;
+    justify-content: center;
+}
+footer.footer .logo {
+    float:none !important;
+    display: block;
+}
+footer .menu--social-media li {
+    margin: 0 5px;
+}
+footer .menu--social-media li a {
+    font-size: 0;
+    border: 2px solid #000;
+    border-radius: 50px;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    padding: 0;
+    position: relative;
+    color:#fff;
+}
+footer .menu--social-media li a svg {
+    font-size: 25px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color:#000;
+}
+footer .menu--social-media li a:hover {
+    /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#d85fa2+0,fe5c8b+100 */
+background: rgb(216,95,162); /* Old browsers */
+background: -moz-linear-gradient(-45deg,  rgba(216,95,162,1) 0%, rgba(254,92,139,1) 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(-45deg,  rgba(216,95,162,1) 0%,rgba(254,92,139,1) 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(135deg,  rgba(216,95,162,1) 0%,rgba(254,92,139,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#d85fa2', endColorstr='#fe5c8b',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+border-color:#fff;
+        color:#fff;
+}
+footer .menu--social-media li a:hover svg {
+    color:#fff;
+}

@@ -1,0 +1,18 @@
+langcode: en
+status: true
+dependencies:
+  theme:
+    - adminimal_theme
+    - adminimal_bot
+id: adminimal_bot_page_title
+theme: adminimal_bot
+region: header
+weight: -30
+provider: null
+plugin: page_title_block
+settings:
+  id: page_title_block
+  label: 'Page title'
+  provider: core
+  label_display: '0'
+visibility: {  }

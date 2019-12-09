@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.fp_widescreen_1200x675
+    - image.style.fp_widescreen_1920x1080
+    - image.style.fp_widescreen_768x432
+    - image.style.fp_widescreen_992x558
+  theme:
+    - bot_custom
+id: widescreen_16_9
+label: 'Widescreen (16:9)'
+image_style_mappings:
+  -
+    breakpoint_id: bot_custom.screen-lg-min
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_widescreen_1920x1080
+  -
+    breakpoint_id: bot_custom.screen-md-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_widescreen_1200x675
+  -
+    breakpoint_id: bot_custom.screen-sm-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_widescreen_992x558
+  -
+    breakpoint_id: bot_custom.screen-xs-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_widescreen_768x432
+breakpoint_group: bot_custom
+fallback_image_style: fp_widescreen_768x432

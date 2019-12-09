@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: fp_widescreen_1200x675
+label: 'FP Widescreen (1200x675)'
+effects:
+  b3e72b09-bd28-408a-8deb-cca1c905e009:
+    uuid: b3e72b09-bd28-408a-8deb-cca1c905e009
+    id: focal_point_crop
+    weight: 1
+    data:
+      width: 1200
+      height: 675
+      crop_type: widescreen_crop

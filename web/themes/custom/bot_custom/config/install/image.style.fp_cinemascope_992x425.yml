@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: fp_cinemascope_992x425
+label: 'FP Cinemascope (992x425)'
+effects:
+  0cff7195-e4e1-4f4f-9a3c-5e19b17474f5:
+    uuid: 0cff7195-e4e1-4f4f-9a3c-5e19b17474f5
+    id: focal_point_crop
+    weight: 1
+    data:
+      width: 992
+      height: 425
+      crop_type: cinemascope_crop

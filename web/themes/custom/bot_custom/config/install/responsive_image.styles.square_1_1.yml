@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - image.style.fp_square_1024
+    - image.style.fp_square_256
+    - image.style.fp_square_512
+    - image.style.fp_square_768
+  theme:
+    - bot_custom
+id: square_1_1
+label: 'Square (1:1)'
+image_style_mappings:
+  -
+    breakpoint_id: bot_custom.screen-lg-min
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_square_1024
+  -
+    breakpoint_id: bot_custom.screen-md-max
+    multiplier: 2x
+    image_mapping_type: image_style
+    image_mapping: fp_square_768
+  -
+    breakpoint_id: bot_custom.screen-sm-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_square_512
+  -
+    breakpoint_id: bot_custom.screen-xs-max
+    multiplier: 1x
+    image_mapping_type: image_style
+    image_mapping: fp_square_256
+breakpoint_group: bot_custom
+fallback_image_style: fp_square_256

@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: fp_landscape_1200x900
+label: 'FP Landscape (1200x900)'
+effects:
+  e56cb674-4dc6-4f7c-ad34-6fb1613b93c7:
+    uuid: e56cb674-4dc6-4f7c-ad34-6fb1613b93c7
+    id: focal_point_crop
+    weight: 1
+    data:
+      width: 1200
+      height: 900
+      crop_type: landscape_crop

@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - focal_point
+name: fp_portrait_768x1024
+label: 'FP Portrait (768x1024)'
+effects:
+  98bb17b2-0527-474d-8ae9-6163ef4076a8:
+    uuid: 98bb17b2-0527-474d-8ae9-6163ef4076a8
+    id: focal_point_crop
+    weight: 1
+    data:
+      width: 768
+      height: 1024
+      crop_type: portrait_crop

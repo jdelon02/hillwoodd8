@@ -1,0 +1,11 @@
+langcode: en
+status: true
+dependencies: {  }
+label: 'Portrait Crop'
+id: portrait_crop
+description: 'Meant for images that should be cropped and rendered in 3:4 ratio.'
+aspect_ratio: '3:4'
+soft_limit_width: null
+soft_limit_height: null
+hard_limit_width: 720
+hard_limit_height: 960

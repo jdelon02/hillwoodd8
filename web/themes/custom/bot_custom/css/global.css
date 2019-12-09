@@ -1,0 +1,39 @@
+/**
+ * If using a CSS pre-processor, tell it to overwrite this file. If not, place
+ * your custom CSS modifications here.
+ */
+
+
+/**********global********/
+body{
+    font-family: 'Merriweather', serif;
+}
+* {
+    transition: all .25s ease-in-out;
+    -moz-transition: all .25s ease-in-out;
+    -webkit-transition: all .25s
+}
+a {
+    color: #000;
+}
+.page-header {
+    border: none;
+}
+a:focus, a:hover {
+    color: #52b3a6;
+    text-decoration: none;
+}
+/*nav*/
+.navbar-default .navbar-nav>li>a {
+    color:#000;
+}
+.navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover {
+    color: #52b3a6;
+}
+.nav>li>a:focus, .nav>li>a:hover {
+    background-color:transparent;
+    background:none;
+}
+
+
+/**********end global********/

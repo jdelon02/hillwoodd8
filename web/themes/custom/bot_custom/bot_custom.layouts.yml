@@ -1,0 +1,35 @@
+# One column.
+bot_1col:
+  label: 'One Col Clickable Media'
+  category: 'BOT Custom Media'
+  class: '\Drupal\bootstrap_layouts\Plugin\Layout\BootstrapLayoutsBase'
+  type: partial
+  icon: images/1col.png
+  template: templates/bot/clickable-media
+  regions:
+    main:
+      label: 'Content'
+      classes:
+        - col-sm-12
+
+# Two column with wrapper.
+bot_2col:
+  label: 'Two column With Wrapper'
+  category: 'BOT Custom'
+  class: '\Drupal\bootstrap_layouts\Plugin\Layout\BootstrapLayoutsBase'
+  type: partial
+  icon: images/2col.png
+  template: templates/bot/bot-2col-wrapper
+  regions:
+    left:
+      label: 'Left'
+      classes:
+        - col-sm-6
+    right:
+      label: 'Right'
+      classes:
+        - col-sm-6
+    bottom:
+      label: 'Bottom'
+      classes:
+       - col-sm-12
