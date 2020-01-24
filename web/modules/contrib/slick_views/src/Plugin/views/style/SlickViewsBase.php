@@ -167,9 +167,12 @@ abstract class SlickViewsBase extends BlazyStylePluginBase {
       // Provides a potential unique thumbnail different from the main image.
       if (!empty($settings['thumbnail'])) {
         $thumbnail = $this->getFieldRenderable($row, 0, $settings['thumbnail']);
-        if (isset($thumbnail['rendered']['#item'])) {
+        if (isset($thumbnail['rendered']['#image_style'], $thumbnail['rendered']['#item'])) {
           $item = $thumbnail['rendered']['#item'];
-          $settings['thumbnail_uri'] = (($entity = $item->entity) && empty($item->uri)) ? $entity->getFileUri() : $item->uri;
+
+          $uri = (($entity = $item->entity) && empty($item->uri)) ? $entity->getFileUri() : $item->uri;
+          $settings['thumbnail_style'] = $thumbnail['rendered']['#image_style'];
+          $settings['thumbnail_uri'] = $this->manager->entityLoad($settings['thumbnail_style'], 'image_style')->buildUri($uri);
         }
       }
 
