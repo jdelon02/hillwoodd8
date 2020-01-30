@@ -113,7 +113,7 @@
     var opts = _db.extend({}, me.globals(), data);
     // Set docroot in case we are in an iframe.
     // @see Blazy.toArray
-    var documentElement = elm.closest('html')
+    var documentElement = _db.closest(elm, 'html');
     if (!document.documentElement.isSameNode(documentElement)) {
       opts.root = documentElement;
       hasDefaultOptions = false;
