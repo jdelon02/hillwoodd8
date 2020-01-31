@@ -346,7 +346,9 @@ class BlazyManager extends BlazyManagerBase {
   /**
    * Returns the entity view, if available.
    *
-   * @deprecated to remove for BlazyEntity::getEntityView() before 2.x.
+   * @deprecated self::getEntityView is deprecated in blazy:8.x-2.0 and will be
+   *   removed from blazy:9.x-1.x. Use BlazyEntity::getEntityView() instead.
+   * @see https://www.drupal.org/node/3103018
    */
   public function getEntityView($entity, array $settings = [], $fallback = '') {
     return FALSE;
@@ -355,12 +357,15 @@ class BlazyManager extends BlazyManagerBase {
   /**
    * Returns the enforced content, or image using theme_blazy().
    *
-   * @deprecated to remove post 2.x for self::getBlazy() for clarity.
    * FYI, most Blazy codes were originally Slick's, PHP, CSS and JS.
    * It was poorly named self::getImage() while Blazy may also contain Media
    * video with iframe element. Probably getMedia() is cool, but let's stick to
    * self::getBlazy() as Blazy also works without Image nor Media video, such as
    * with just a DIV element for CSS background.
+   *
+   * @deprecated in blazy:8.x-2.0 and will be removed from blazy:9.x-1.x. Use
+   *   self::getBlazy() instead.
+   * @see https://www.drupal.org/node/3103018
    */
   public function getImage(array $build = []) {
     return $this->getBlazy($build);

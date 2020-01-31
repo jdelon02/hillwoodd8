@@ -282,7 +282,7 @@ class Blazy implements BlazyInterface {
 
     // Provides image_url expected by lazyload, not URI.
     $uri = $settings['uri'];
-    $image_url = file_valid_uri($uri) ? self::transformRelative($uri) : $uri;
+    $image_url = self::isValidUri($uri) ? self::transformRelative($uri) : $uri;
     $settings['image_url'] = $settings['image_url'] ?: $image_url;
 
     // Image style modifier can be multi-style images such as GridStack.
@@ -483,6 +483,36 @@ class Blazy implements BlazyInterface {
     // Do not use dynamic Html::getUniqueId, otherwise broken AJAX.
     $id = empty($id) ? ($string . '-' . ++static::$blazyId) : $id;
     return Html::getId($id);
+  }
+
+  /**
+   * Determines whether the URI has a valid scheme for file API operations.
+   *
+   * This is just a wrapper around
+   * Drupal\Core\StreamWrapper\StreamWrapperManager::isValidUri() for Drupal
+   * versions >= 8.8, with a fallback to file_valid_uri() for prior Drupal
+   * versions.
+   *
+   * @param string $uri
+   *   The URI to be tested.
+   *
+   * @return bool
+   *   TRUE if the URI is valid.
+   *
+   * @todo Remove this once Drupal 8.7 is no longer supported.
+   */
+  private static function isValidUri($uri) {
+    if (version_compare(\Drupal::VERSION, '8.8', '>=')) {
+      return \Drupal::service('stream_wrapper_manager')->isValidUri($uri);
+    }
+    else {
+      // Because this code only runs for older Drupal versions, we do not need
+      // or want IDEs or the Upgrade Status module warning people about this
+      // deprecated code usage. Setting the function name dynamically
+      // circumvents those warnings.
+      $function = 'file_valid_uri';
+      return $function($uri);
+    }
   }
 
 }
