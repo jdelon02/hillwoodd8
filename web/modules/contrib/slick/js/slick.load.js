@@ -18,7 +18,7 @@
   function doSlick(i, elm) {
     var t = $('> .slick__slider', elm).length ? $('> .slick__slider', elm) : $(elm);
     var a = $('> .slick__arrow', elm);
-    var o = t.data('slick') ? $.extend({}, drupalSettings.slick, t.data('slick')) : drupalSettings.slick;
+    var o = t.data('slick') ? $.extend({}, drupalSettings.slick, t.data('slick')) : $.extend({}, drupalSettings.slick);
     var r = $.type(o.responsive) === 'array' && o.responsive.length ? o.responsive : false;
     var d = o.appendDots;
     var b;
