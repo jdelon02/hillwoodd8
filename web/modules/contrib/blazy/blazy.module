@@ -181,7 +181,9 @@ function blazy_parse_markdown($string) {
 /**
  * Implements hook_field_formatter_info_alter().
  *
- * @deprecated to be removed for core Media pre/post Blazy 8.2.x full release.
+ * @deprecated in blazy:8.x-2.0 and will be removed from blazy:9.x-1.x. Use
+ *   \Drupal\blazy\Plugin\Field\FieldFormatter\BlazyMediaFormatter instead.
+ * @see https://www.drupal.org/node/3103018
  */
 function blazy_field_formatter_info_alter(array &$info) {
   // Supports optional Media Entity via VEM/VEF if available.
