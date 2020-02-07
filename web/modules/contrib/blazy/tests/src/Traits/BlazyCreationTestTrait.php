@@ -486,17 +486,9 @@ trait BlazyCreationTestTrait {
     }
 
     if (empty($this->url)) {
-      $source = DRUPAL_ROOT . '/core/modules/simpletest/files/image-1.png';
+      $source = DRUPAL_ROOT . '/core/misc/druplicon.png';
       $uri = 'public://test.png';
-
-      // Compatibility for 8.7+.
-      if (isset($this->fileSystem) && method_exists($this->fileSystem, 'copy')) {
-        $this->fileSystem->copy($source, $uri, FileSystemInterface::EXISTS_REPLACE);
-      }
-      elseif (function_exists('file_unmanaged_copy')) {
-        file_unmanaged_copy($source, $uri, FILE_EXISTS_REPLACE);
-      }
-
+      $this->fileSystem->copy($source, $uri, FileSystemInterface::EXISTS_REPLACE);
       $this->url = file_create_url($uri);
     }
 
@@ -537,14 +529,7 @@ trait BlazyCreationTestTrait {
 
     if (!is_file($uri)) {
       $this->prepareTestDirectory();
-
-      // Compatibility for 8.7+.
-      if (isset($this->fileSystem) && method_exists($this->fileSystem, 'saveData')) {
-        $this->fileSystem->saveData($source, $uri, FileSystemInterface::EXISTS_REPLACE);
-      }
-      elseif (function_exists('file_unmanaged_save_data')) {
-        file_unmanaged_save_data($source, $uri, FILE_EXISTS_REPLACE);
-      }
+      $this->fileSystem->saveData($source, $uri, FileSystemInterface::EXISTS_REPLACE);
     }
 
     $uri = 'public://simpletest/' . $this->testPluginId . '/' . $name;
@@ -566,13 +551,7 @@ trait BlazyCreationTestTrait {
    */
   protected function prepareTestDirectory() {
     $this->testDirPath = \Drupal::root() . '/sites/default/files/simpletest/' . $this->testPluginId;
-    // Compatibility for 8.7+.
-    if (isset($this->fileSystem) && method_exists($this->fileSystem, 'prepareDirectory')) {
-      $this->fileSystem->prepareDirectory($this->testDirPath, FileSystemInterface::CREATE_DIRECTORY);
-    }
-    elseif (function_exists('file_prepare_directory')) {
-      file_prepare_directory($this->testDirPath, FILE_CREATE_DIRECTORY);
-    }
+    $this->fileSystem->prepareDirectory($this->testDirPath, FileSystemInterface::CREATE_DIRECTORY);
   }
 
 }

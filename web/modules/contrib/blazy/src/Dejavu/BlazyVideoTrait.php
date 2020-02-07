@@ -110,8 +110,11 @@ trait BlazyVideoTrait {
    * @param object $media
    *   The core Media entity.
    *
-   * @deprecated for BlazyOEmbed::getMediaItem().
    * @todo remove post Blazy 8.2.x when blazy-plugins use core Media.
+   *
+   * @deprecated self::getMediaItem is in blazy:8.x-2.0 and will be removed from
+   *   blazy:9.x-1.x. Use BlazyOEmbed::getMediaItem() instead.
+   * @see https://www.drupal.org/node/3103018
    */
   public function getMediaItem(array &$data = [], $media = NULL) {
     $this->blazyOembed()->getMediaItem($data, $media);
@@ -125,11 +128,14 @@ trait BlazyVideoTrait {
    * @param string $external_url
    *   A video URL.
    *
-   * @deprecated for BlazyOEmbed::build().
    * @todo remove post Blazy 8.2.x full release. This is still kept to
    * allow changing from video_embed_field into media field without breaking it,
    * and to allow transition from blazy-related modules to depend on media.
    * Currently this is only required by deprecated SlickVideoFormatter.
+   *
+   * @deprecated self::buildVideo() is deprecated in blazy:8.x-2.0 and will be
+   *   removed from blazy:9.x-1.x. Use BlazyOEmbed::build() instead.
+   * @see https://www.drupal.org/node/3103018
    */
   public function buildVideo(array &$settings = [], $external_url = '') {
     $settings['input_url'] = empty($settings['input_url']) ? $external_url : $settings['input_url'];
