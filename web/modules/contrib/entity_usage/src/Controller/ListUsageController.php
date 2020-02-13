@@ -2,6 +2,7 @@
 
 namespace Drupal\entity_usage\Controller;
 
+use Drupal\block_content\BlockContentInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
@@ -297,6 +298,11 @@ class ListUsageController extends ControllerBase {
   /**
    * Retrieve a link to the source entity.
    *
+   * Note that some entities are special-cased, since they don't have canonical
+   * template and aren't expected to be re-usable. For example, if the entity
+   * passed in is a paragraph or a block content, the link we produce will point
+   * to this entity's parent (host) entity instead.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $source_entity
    *   The source entity.
    * @param string|null $text
@@ -307,9 +313,6 @@ class ListUsageController extends ControllerBase {
    *   A link to the entity, or its non-linked label, in case it was impossible
    *   to correctly build a link. Will return FALSE if this item should not be
    *   shown on the UI (for example when dealing with an orphan paragraph).
-   *   Note that Paragraph entities are specially treated. This function will
-   *   return the link to its parent entity, relying on the fact that paragraphs
-   *   have only one single parent and don't have canonical template.
    */
   protected function getSourceEntityLink(EntityInterface $source_entity, $text = NULL) {
     // Note that $paragraph_entity->label() will return a string of type:
@@ -322,6 +325,11 @@ class ListUsageController extends ControllerBase {
     }
     elseif ($source_entity->hasLinkTemplate('canonical')) {
       $rel = 'canonical';
+    }
+
+    // Block content likely used in Layout Builder inline blocks.
+    if ($source_entity instanceof BlockContentInterface && !$source_entity->isReusable()) {
+      $rel = NULL;
     }
 
     if ($rel) {
@@ -369,6 +377,23 @@ class ListUsageController extends ControllerBase {
         return FALSE;
       }
       return $this->getSourceEntityLink($parent, $entity_label);
+    }
+    // Treat block_content entities in a special manner. Block content
+    // relationships are stored as serialized data on the host entity. This
+    // makes it difficult to query parent data. Instead we look up relationship
+    // data which may exist in entity_usage tables. This requires site builders
+    // to set up entity usage on host-entity-type -> block_content manually.
+    // @todo this could be made more generic to support other entity types with
+    // difficult to handle parent -> child relationships.
+    elseif ($source_entity->getEntityTypeId() === 'block_content') {
+      $sources = $this->entityUsage->listSources($source_entity, FALSE);
+      $source = reset($sources);
+      if ($source !== FALSE) {
+        $parent = $this->entityTypeManager()->getStorage($source['source_type'])->load($source['source_id']);
+        if ($parent) {
+          return $this->getSourceEntityLink($parent);
+        }
+      }
     }
 
     // As a fallback just return a non-linked label.

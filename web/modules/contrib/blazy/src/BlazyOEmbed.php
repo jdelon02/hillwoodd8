@@ -251,6 +251,12 @@ class BlazyOEmbed {
     if ($media->hasField('thumbnail')) {
       /** @var Drupal\image\Plugin\Field\FieldType\ImageItem $item */
       $item = $media->get('thumbnail')->first();
+
+      // Title is NULL from thumbnail, likely core bug, so fallback to source.
+      if ($settings['media_source'] == 'image') {
+        $item = $media->get($settings['source_field'])->get(0);
+      }
+
       $settings['file_tags'] = ['file:' . $item->target_id];
 
       // Provides thumbnail URI for EB selection with various Media entities.
