@@ -1,4 +1,18 @@
 
+Blazy 8.x-2.0-dev, 2019-12-25
+-----------------------------
+- Updated for core removing simpletest files.
+- Fixed for coding standard issues, see #3024461.
+- Issue #3088298 by effulgentsia, chr.fritsch, anavarre, Kristen Pol: [META]
+  Drupal 9 Deprecation Notices for Blazy
+
+Blazy 8.x-2.0-dev, 2019-12-01
+-----------------------------
+- Added fallback to source since Title is NULL from thumbnail, likely core bug.
+- Issue #3087084 by thalles: Add new key core_version_requirement in info.yml
+- Issue #3085580 by michiellucas, lindsaywilson23, anruether: IE 11: Js error -
+  Object doesn'\''t support property or method '\''closest'\'''
+
 Blazy 8.x-2.0-dev, 2019-08-23
 -----------------------------
 - Issue #3070575 by gausarts, DuneBL: Notice: Undefined index: resimage

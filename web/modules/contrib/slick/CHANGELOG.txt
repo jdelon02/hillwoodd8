@@ -1,4 +1,9 @@
 
+Slick 8.x-2.0-dev, 2020-01-01
+-----------------------------
+- Issue #3088244 by aarnau, d70rr3s, igonzalez: [Regression]: Dots are not
+  assigned to the proper slick slider when multiple slick are on the page.
+
 Slick 8.x-2.0-dev, 2019-04-27
 -----------------------------
 - Updated docs.
