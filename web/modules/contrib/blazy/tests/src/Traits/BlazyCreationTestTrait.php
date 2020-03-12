@@ -256,7 +256,7 @@ trait BlazyCreationTestTrait {
         $max = $multiple ? $this->maxItems : 2;
         if (isset($node->{$field_name})) {
           // @see \Drupal\Core\Field\FieldItemListInterface::generateSampleItems
-          $node->{$field_name}->generateSampleItems($max);
+          $node->get($field_name)->generateSampleItems($max);
         }
       }
     }
@@ -486,21 +486,13 @@ trait BlazyCreationTestTrait {
     }
 
     if (empty($this->url)) {
-      $source = DRUPAL_ROOT . '/core/modules/simpletest/files/image-1.png';
+      $source = $this->root . '/core/misc/druplicon.png';
       $uri = 'public://test.png';
-
-      // Compatibility for 8.7+.
-      if (isset($this->fileSystem) && method_exists($this->fileSystem, 'copy')) {
-        $this->fileSystem->copy($source, $uri, FileSystemInterface::EXISTS_REPLACE);
-      }
-      elseif (function_exists('file_unmanaged_copy')) {
-        file_unmanaged_copy($source, $uri, FILE_EXISTS_REPLACE);
-      }
-
+      $this->fileSystem->copy($source, $uri, FileSystemInterface::EXISTS_REPLACE);
       $this->url = file_create_url($uri);
     }
 
-    $this->testItem = $item;
+    $this->testItem = $this->image = $item;
 
     $this->data = [
       'settings' => $this->getFormatterSettings(),
@@ -514,7 +506,7 @@ trait BlazyCreationTestTrait {
    * Returns path to the stored image location.
    */
   protected function getImagePath($is_dir = FALSE) {
-    $path            = \Drupal::root() . '/sites/default/files/simpletest/' . $this->testPluginId;
+    $path            = $this->root . '/sites/default/files/simpletest/' . $this->testPluginId;
     $item            = $this->createDummyImage();
     $this->dummyUrl  = file_url_transform_relative(file_create_url($this->dummyUri));
     $this->dummyItem = $item;
@@ -530,21 +522,14 @@ trait BlazyCreationTestTrait {
    * Returns the created image file.
    */
   protected function createDummyImage($name = '', $source = '') {
-    $path   = \Drupal::root() . '/sites/default/files/simpletest/' . $this->testPluginId;
+    $path   = $this->root . '/sites/default/files/simpletest/' . $this->testPluginId;
     $name   = empty($name) ? $this->testPluginId . '.png' : $name;
-    $source = empty($source) ? \Drupal::root() . '/core/misc/druplicon.png' : $source;
+    $source = empty($source) ? $this->root . '/core/misc/druplicon.png' : $source;
     $uri    = $path . '/' . $name;
 
     if (!is_file($uri)) {
       $this->prepareTestDirectory();
-
-      // Compatibility for 8.7+.
-      if (isset($this->fileSystem) && method_exists($this->fileSystem, 'saveData')) {
-        $this->fileSystem->saveData($source, $uri, FileSystemInterface::EXISTS_REPLACE);
-      }
-      elseif (function_exists('file_unmanaged_save_data')) {
-        file_unmanaged_save_data($source, $uri, FILE_EXISTS_REPLACE);
-      }
+      $this->fileSystem->saveData($source, $uri, FileSystemInterface::EXISTS_REPLACE);
     }
 
     $uri = 'public://simpletest/' . $this->testPluginId . '/' . $name;
@@ -565,14 +550,8 @@ trait BlazyCreationTestTrait {
    * Prepares test directory to store screenshots, or images.
    */
   protected function prepareTestDirectory() {
-    $this->testDirPath = \Drupal::root() . '/sites/default/files/simpletest/' . $this->testPluginId;
-    // Compatibility for 8.7+.
-    if (isset($this->fileSystem) && method_exists($this->fileSystem, 'prepareDirectory')) {
-      $this->fileSystem->prepareDirectory($this->testDirPath, FileSystemInterface::CREATE_DIRECTORY);
-    }
-    elseif (function_exists('file_prepare_directory')) {
-      file_prepare_directory($this->testDirPath, FILE_CREATE_DIRECTORY);
-    }
+    $this->testDirPath = $this->root . '/sites/default/files/simpletest/' . $this->testPluginId;
+    $this->fileSystem->prepareDirectory($this->testDirPath, FileSystemInterface::CREATE_DIRECTORY);
   }
 
 }
