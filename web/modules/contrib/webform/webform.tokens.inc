@@ -6,7 +6,6 @@
  */
 
 use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Utility\Xss;
 use Drupal\Component\Render\MarkupInterface;
 use Drupal\Core\Datetime\Entity\DateFormat;
 use Drupal\Core\Entity\EntityInterface;
@@ -19,6 +18,7 @@ use Drupal\webform\Plugin\WebformElementManagerInterface;
 use Drupal\webform\Plugin\WebformElementEntityReferenceInterface;
 use Drupal\webform\Plugin\WebformElement\WebformComputedBase;
 use Drupal\webform\Utility\WebformDateHelper;
+use Drupal\webform\Utility\WebformHtmlHelper;
 use Drupal\webform\Utility\WebformLogicHelper;
 use Drupal\webform\WebformInterface;
 use Drupal\webform\WebformSubmissionInterface;
@@ -91,11 +91,11 @@ function webform_token_info() {
   ];
   $webform_submission['current-page'] = [
     'name' => t('Current page'),
-    'description' => t('The current (wizard) page of the webform submission.'),
+    'description' => t('The current (last submitted) wizard page of the webform submission.'),
   ];
   $webform_submission['current-page:title'] = [
     'name' => t('Current page title'),
-    'description' => t('The current (wizard) page title of the webform submission.'),
+    'description' => t('The current (last submitted) wizard page title of the webform submission.'),
   ];
   $webform_submission['in-draft'] = [
     'name' => t('In draft'),
@@ -817,7 +817,7 @@ function webform_tokens($type, $tokens, array $data, array $options, BubbleableM
             $token_value = \Drupal::service('renderer')->renderPlain($token_value);
           }
           else {
-            $token_value = Markup::create(Xss::filter($token_value));
+            $token_value = WebformHtmlHelper::toHtmlMarkup($token_value);
           }
           $replacements[$original] = $token_value;
         }
@@ -1090,6 +1090,24 @@ function _webform_token_render_more($more_title, $more) {
     '#more' => $more,
     '#more_title' => $more_title,
   ];
+
+  // Token info might be called via CLI and not all modules are loaded
+  // or an active theme is defined.
+  //
+  // Prevent the below expections:
+  // - The theme implementations may not be rendered until all modules
+  //   are loaded.
+  // - Call to a member function setParser() on array in Twig\Parser->parse().
+  //
+  // @see \Drupal\Core\Theme\ThemeManager::render
+  /** @var \Drupal\Core\Extension\ModuleHandlerInterface $module_handler */
+  $module_handler = \Drupal::service('module_handler');
+  /** @var \Drupal\webform\WebformThemeManagerInterface $theme_manager */
+  $theme_manager = \Drupal::service('webform.theme_manager');
+  if (!$module_handler->isLoaded() || !$theme_manager->hasActiveTheme()) {
+    return '';
+  }
+
   return (string) \Drupal::service('renderer')->renderPlain($build);
 }
 
