@@ -34,7 +34,12 @@ class Link extends EntityUsageTrackBase {
     $target_id = $route_parameters[$target_type];
 
     // Only return a valid result if the target entity exists.
-    if (!$this->entityTypeManager->getStorage($target_type)->load($target_id)) {
+    try {
+      if (!$this->entityTypeManager->getStorage($target_type)->load($target_id)) {
+        return [];
+      }
+    }
+    catch (\Exception $exception) {
       return [];
     }
 
