@@ -7,11 +7,16 @@ Currently the following tracking methods are supported:
 
 - Entities related trough entity_reference fields
 - Entities related trough link fields
+- Standard HTML links inside text fields (when pointing to an entity URL).
 - Entities embedded into text fields using the Entity Embed module
 - Entities embedded into text fields using the LinkIt module
-- Standard HTML links inside text fields (when pointing to an entity URL).
 - Entities related through block_field fields (provided by the Block Field
   module)
+- Entities related through entity_reference_revision fields
+- Entities related through dynamic_entity_reference fields
+- Entities related through Layout Builder. Supported methods: Core's inline
+(non-reusable) content blocks, and entities selected through the contributed
+Entity Browser Block module.
 
 How it works
 ============
