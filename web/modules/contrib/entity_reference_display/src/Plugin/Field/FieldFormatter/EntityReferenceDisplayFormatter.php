@@ -100,13 +100,15 @@ class EntityReferenceDisplayFormatter extends EntityReferenceEntityFormatter {
     // Get all fields associated with current entity.
     $entity_type = $field_definition->getTargetEntityTypeId();
     $entity_bundle = $field_definition->getTargetBundle();
-    $entity_fields = \Drupal::service('entity_field.manager')
-      ->getFieldDefinitions($entity_type, $entity_bundle);
-    /** @var \Drupal\Core\Field\FieldDefinitionInterface $field */
-    foreach ($entity_fields as $field) {
-      // Formatter is only available for entity types with display mode field.
-      if ($field->getType() == 'entity_reference_display') {
-        return TRUE;
+    if (!empty($entity_bundle)) {
+      $entity_fields = \Drupal::service('entity_field.manager')
+        ->getFieldDefinitions($entity_type, $entity_bundle);
+      /** @var \Drupal\Core\Field\FieldDefinitionInterface $field */
+      foreach ($entity_fields as $field) {
+        // Formatter is only available for entity types with display mode field.
+        if ($field->getType() == 'entity_reference_display') {
+          return TRUE;
+        }
       }
     }
     return FALSE;
