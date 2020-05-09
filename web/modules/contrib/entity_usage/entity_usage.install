@@ -358,18 +358,22 @@ function entity_usage_update_8204(&$sandbox) {
     ],
   ];
   $schema = \Drupal::database()->schema();
-  $schema->addIndex(
-    'entity_usage',
-    'source_entity',
-    ['source_type','source_id'],
-    $spec
-  );
-  $schema->addIndex(
-    'entity_usage',
-    'source_entity_string',
-    ['source_type','source_id_string'],
-    $spec
-  );
+  if (!$schema->indexExists('entity_usage', 'source_entity')) {
+    $schema->addIndex(
+      'entity_usage',
+      'source_entity',
+      ['source_type','source_id'],
+      $spec
+    );
+  }
+  if (!$schema->indexExists('entity_usage', 'source_entity_string')) {
+    $schema->addIndex(
+      'entity_usage',
+      'source_entity_string',
+      ['source_type','source_id_string'],
+      $spec
+    );
+  }
 }
 
 /**
