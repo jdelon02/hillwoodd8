@@ -126,6 +126,21 @@ class SettingsForm extends ConfigFormBase {
           ],
         ],
       ],
+      'external_svg_integrity' => [
+        '#type' => 'textfield',
+        '#title' => $this->t('External File Integrity Value'),
+        '#default_value' => $fontawesome_config->get('external_svg_integrity'),
+        '#size' => 80,
+        '#description' => $this->t('Enter an (optional) integrity value for checking the CDN. This value should be provided by Font Awesome alongside the CDN source. This will force the browser to confirm the integrity of the CDN to prevent unexpected content from being loaded.'),
+        '#states' => [
+          'disabled' => [
+            ':input[name="use_cdn"]' => ['checked' => FALSE],
+          ],
+          'visible' => [
+            ':input[name="use_cdn"]' => ['checked' => TRUE],
+          ],
+        ],
+      ],
     ];
 
     $form['partial'] = [
@@ -156,6 +171,12 @@ class SettingsForm extends ConfigFormBase {
         '#title' => $this->t('Load brand icons'),
         '#description' => $this->t('Checking this box will cause the Font Awesome library to load the file containing the brands icon declarations (<i>brands.js/brands.css</i>)'),
         '#default_value' => is_null($fontawesome_config->get('use_brands_file')) === TRUE ? TRUE : $fontawesome_config->get('use_brands_file'),
+      ],
+      'use_duotone_file' => [
+        '#type' => 'checkbox',
+        '#title' => $this->t('Load duotone icons'),
+        '#description' => $this->t('Checking this box will cause the Font Awesome library to load the file containing the duotone icon declarations (<i>duotone.js/duotone.css</i>)'),
+        '#default_value' => is_null($fontawesome_config->get('use_duotone_file')) === TRUE ? TRUE : $fontawesome_config->get('use_duotone_file'),
       ],
     ];
 
@@ -243,6 +264,7 @@ class SettingsForm extends ConfigFormBase {
       ->set('method', $values['method'])
       ->set('use_cdn', $values['use_cdn'])
       ->set('external_svg_location', (string) $values['external_svg_location'])
+      ->set('external_svg_integrity', (string) $values['external_svg_integrity'])
       ->set('use_shim', $values['use_shim'])
       ->set('external_shim_location', (string) $values['external_shim_location'])
       ->set('allow_pseudo_elements', $values['allow_pseudo_elements'])
@@ -250,6 +272,7 @@ class SettingsForm extends ConfigFormBase {
       ->set('use_regular_file', $values['use_regular_file'])
       ->set('use_light_file', $values['use_light_file'])
       ->set('use_brands_file', $values['use_brands_file'])
+      ->set('use_duotone_file', $values['use_duotone_file'])
       ->save();
 
     parent::submitForm($form, $form_state);

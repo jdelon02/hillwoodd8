@@ -71,7 +71,7 @@ interface InlineFormInterface extends EntityHandlerInterface {
    *     to the callback. The entity and the theme variables are always passed
    *     as as the first two arguments.
    */
-  public function getTableFields($bundles);
+  public function getTableFields(array $bundles);
 
   /**
    * Checks whether tabledrag should be enabled for the given table.
@@ -82,7 +82,7 @@ interface InlineFormInterface extends EntityHandlerInterface {
    * @return bool
    *   TRUE if tabledrag should be enabled, FALSE otherwise.
    */
-  public function isTableDragEnabled($element);
+  public function isTableDragEnabled(array $element);
 
   /**
    * Builds the entity form.
@@ -141,6 +141,6 @@ interface InlineFormInterface extends EntityHandlerInterface {
    *   - parent_entity_type: The type of the parent entity.
    *   - parent_entity: The parent entity.
    */
-  public function delete($ids, $context);
+  public function delete(array $ids, array $context);
 
 }

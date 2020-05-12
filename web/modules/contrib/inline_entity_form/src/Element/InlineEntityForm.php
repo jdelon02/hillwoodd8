@@ -3,8 +3,8 @@
 namespace Drupal\inline_entity_form\Element;
 
 use Drupal\Core\Entity\EntityInterface;
+use Drupal\Core\Entity\RevisionLogInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Element;
 use Drupal\Core\Render\Element\RenderElement;
 use Drupal\inline_entity_form\ElementSubmit;
 use Drupal\inline_entity_form\TranslationHelper;
@@ -45,6 +45,8 @@ class InlineEntityForm extends RenderElement {
       '#default_value' => NULL,
       // The form mode used to display the entity form.
       '#form_mode' => 'default',
+      // Will create a new revision if set to TRUE.
+      '#revision' => FALSE,
       // Will save entity on submit if set to TRUE.
       '#save_entity' => TRUE,
       // 'add', 'edit' or 'duplicate'.
@@ -89,7 +91,7 @@ class InlineEntityForm extends RenderElement {
    * @return array
    *   The built entity form.
    */
-  public static function processEntityForm($entity_form, FormStateInterface $form_state, &$complete_form) {
+  public static function processEntityForm(array $entity_form, FormStateInterface $form_state, array &$complete_form) {
     if (empty($entity_form['#entity_type'])) {
       throw new \InvalidArgumentException('The inline_entity_form element requires the #entity_type property.');
     }
@@ -97,6 +99,7 @@ class InlineEntityForm extends RenderElement {
       throw new \InvalidArgumentException('The inline_entity_form #default_value property must be an entity object.');
     }
 
+    $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_form['#entity_type']);
     if (empty($entity_form['#ief_id'])) {
       $entity_form['#ief_id'] = \Drupal::service('uuid')->generate();
     }
@@ -106,7 +109,6 @@ class InlineEntityForm extends RenderElement {
     }
     else {
       // This is an add operation, create a new entity.
-      $entity_type = \Drupal::entityTypeManager()->getDefinition($entity_form['#entity_type']);
       $storage = \Drupal::entityTypeManager()->getStorage($entity_form['#entity_type']);
       $values = [];
       if ($langcode_key = $entity_type->getKey('langcode')) {
@@ -132,6 +134,17 @@ class InlineEntityForm extends RenderElement {
     $entity_form['#entity'] = TranslationHelper::prepareEntity($entity_form['#entity'], $form_state);
     $entity_form['#translating'] = TranslationHelper::isTranslating($form_state) && $entity_form['#entity']->isTranslatable();
 
+    // Handle revisioning if the entity supports it.
+    if ($entity_type->isRevisionable() && $entity_form['#revision']) {
+      $entity_form['#entity']->setNewRevision($entity_form['#revision']);
+
+      // @see \Drupal\Core\Entity\ContentEntityForm::buildEntity
+      if ($entity_form['#entity'] instanceof RevisionLogInterface) {
+        $entity_form['#entity']->setRevisionUserId(\Drupal::currentUser()->id());
+        $entity_form['#entity']->setRevisionCreationTime(\Drupal::time()->getRequestTime());
+      }
+    }
+
     $inline_form_handler = static::getInlineFormHandler($entity_form['#entity_type']);
     $entity_form = $inline_form_handler->entityForm($entity_form, $form_state);
     // The form element can't rely on inline_entity_form_form_alter() calling
@@ -149,7 +162,7 @@ class InlineEntityForm extends RenderElement {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public static function validateEntityForm(&$entity_form, FormStateInterface $form_state) {
+  public static function validateEntityForm(array &$entity_form, FormStateInterface $form_state) {
     $inline_form_handler = static::getInlineFormHandler($entity_form['#entity_type']);
     $inline_form_handler->entityFormValidate($entity_form, $form_state);
   }
@@ -162,7 +175,7 @@ class InlineEntityForm extends RenderElement {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
-  public static function submitEntityForm(&$entity_form, FormStateInterface $form_state) {
+  public static function submitEntityForm(array &$entity_form, FormStateInterface $form_state) {
     $inline_form_handler = static::getInlineFormHandler($entity_form['#entity_type']);
     $inline_form_handler->entityFormSubmit($entity_form, $form_state);
     if ($entity_form['#save_entity']) {

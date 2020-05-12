@@ -19,18 +19,18 @@ class LocalTaskEntityTest extends FunctionalTestBase {
   /**
    * Information about the entity type we are using for testing.
    *
-   * @see \Drupal\Tests\eck\Functional\FunctionalTestBase::createEntityType()
-   *
    * @var array
+   *
+   * @see \Drupal\Tests\eck\Functional\FunctionalTestBase::createEntityType()
    */
   protected $entityTypeInfo;
 
   /**
    * Information about the bundle we are using for testing.
    *
-   * @see \Drupal\Tests\eck\Functional\FunctionalTestBase::createEntityBundle()
-   *
    * @var array
+   *
+   * @see \Drupal\Tests\eck\Functional\FunctionalTestBase::createEntityBundle()
    */
   protected $bundleInfo;
 
@@ -66,8 +66,11 @@ class LocalTaskEntityTest extends FunctionalTestBase {
 
   /**
    * Go to a page and check if exist the local task links.
+   *
    * @param string $route
+   *   The route.
    * @param array $routeArguments
+   *   The rout arguments.
    */
   protected function assertLocalTasksFor($route, array $routeArguments) {
     $this->drupalGet(Url::fromRoute($route, $routeArguments));
@@ -90,12 +93,13 @@ class LocalTaskEntityTest extends FunctionalTestBase {
     $url = Url::fromRoute($route, $route_args);
     $links = $this->xpath('//ul/li/a[contains(@href, :href) and normalize-space(text())=:label]', [
       ':href' => $url->toString(),
-      ':label' => $label
+      ':label' => $label,
     ]);
 
     $this->assertEquals(1, count($links), t('Link with label %label found and its route is :route', [
       ':route' => $route,
-      '%label' => $label
+      '%label' => $label,
     ]));
   }
+
 }

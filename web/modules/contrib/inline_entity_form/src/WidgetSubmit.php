@@ -22,7 +22,7 @@ class WidgetSubmit {
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state.
    */
-  public static function attach(&$form, FormStateInterface $form_state) {
+  public static function attach(array &$form, FormStateInterface $form_state) {
     // $form['#ief_element_submit'] runs after the #ief_element_submit
     // callbacks of all subelements, which means that doSubmit() has
     // access to the final IEF $form_state.

@@ -190,6 +190,7 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
   public static function defaultSettings() {
     return [
       'form_mode' => 'default',
+      'revision' => FALSE,
       'override_labels' => FALSE,
       'label_singular' => '',
       'label_plural' => '',
@@ -211,6 +212,11 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
       '#default_value' => $this->getSetting('form_mode'),
       '#options' => $this->entityDisplayRepository->getFormModeOptions($entity_type_id),
       '#required' => TRUE,
+    ];
+    $element['revision'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t('Create new revision'),
+      '#default_value' => $this->getSetting('revision'),
     ];
     $element['override_labels'] = [
       '#type' => 'checkbox',
@@ -267,7 +273,7 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
     else {
       $form_mode_label = $this->t('Default');
     }
-    $summary[] = t('Form mode: @mode', ['@mode' => $form_mode_label]);
+    $summary[] = $this->t('Form mode: @mode', ['@mode' => $form_mode_label]);
     if ($this->getSetting('override_labels')) {
       $summary[] = $this->t(
         'Overriden labels are used: %singular and %plural',
@@ -278,8 +284,13 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
       $summary[] = $this->t('Default labels are used.');
     }
 
+    if ($this->getSetting('revision')) {
+      $summary[] = $this->t('Create new revision');
+    }
+
     if ($this->getSetting('collapsible')) {
-      $summary[] = $this->t($this->getSetting('collapsed') ? 'Collapsible, collapsed by default' : 'Collapsible');
+      $collapsed_summary = $this->getSetting('collapsed') ? 'Collapsible, collapsed by default' : 'Collapsible';
+      $summary[] = $this->t('@collapsed_summary', ['@collapsed_summary' => $collapsed_summary]);
     }
 
     return $summary;
@@ -348,7 +359,8 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
         'delete' => [],
         'entities' => [],
       ];
-      // Store the $items entities in the widget state, for further manipulation.
+      // Store the $items entities in the widget state, for further
+      // manipulation.
       foreach ($items as $delta => $item) {
         $entity = $item->entity;
         // The $entity can be NULL if the reference is broken.
@@ -378,6 +390,8 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
    *   Entity bundle.
    * @param string $langcode
    *   Entity langcode.
+   * @param int $delta
+   *   The order of this item in the array of sub-elements (0, 1, 2, etc.).
    * @param array $parents
    *   Array of parent element names.
    * @param \Drupal\Core\Entity\EntityInterface $entity
@@ -395,6 +409,7 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
       '#default_value' => $entity,
       '#op' => $operation,
       '#form_mode' => $this->getSetting('form_mode'),
+      '#revision' => $this->getSetting('revision'),
       '#save_entity' => FALSE,
       '#ief_row_delta' => $delta,
       // Used by Field API and controller methods to find the relevant
@@ -461,7 +476,7 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
    * @param array $element
    *   Form array structure.
    */
-  public static function addIefSubmitCallbacks($element) {
+  public static function addIefSubmitCallbacks(array $element) {
     $element['#ief_element_submit'][] = [get_called_class(), 'submitSaveEntity'];
     return $element;
   }
@@ -472,12 +487,12 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
    * Note that at this point the entity is not yet saved, since the user might
    * still decide to cancel the parent form.
    *
-   * @param $entity_form
+   * @param array $entity_form
    *   The form of the entity being managed inline.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of the parent form.
    */
-  public static function submitSaveEntity($entity_form, FormStateInterface $form_state) {
+  public static function submitSaveEntity(array $entity_form, FormStateInterface $form_state) {
     $ief_id = $entity_form['#ief_id'];
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $entity_form['#entity'];
@@ -558,6 +573,7 @@ abstract class InlineEntityFormBase extends WidgetBase implements ContainerFacto
    * Determines if the current user can add any new entities.
    *
    * @return bool
+   *   TRUE if the current user can add any new entities, FALSE otherwise.
    */
   protected function canAddNew() {
     $create_bundles = $this->getCreateBundles();

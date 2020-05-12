@@ -3,15 +3,17 @@
 namespace Drupal\inline_entity_form\Form;
 
 use Drupal\Core\Entity\ContentEntityInterface;
+use Drupal\Core\Entity\ContentEntityTypeInterface;
 use Drupal\Core\Entity\Entity\EntityFormDisplay;
-use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
+use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Field\WidgetBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Render\Element;
+use Drupal\Core\StringTranslation\StringTranslationTrait;
 use Drupal\inline_entity_form\InlineFormInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -19,6 +21,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  * Generic entity inline form handler.
  */
 class EntityInlineForm implements InlineFormInterface {
+
+  use StringTranslationTrait;
 
   /**
    * The entity field manager.
@@ -90,10 +94,10 @@ class EntityInlineForm implements InlineFormInterface {
    * {@inheritdoc}
    */
   public function getEntityTypeLabels() {
-    $lowercase_label = $this->entityType->getLowercaseLabel();
+    $lowercase_label = $this->entityType->getSingularLabel();
     return [
       'singular' => $lowercase_label,
-      'plural' => t('@entity_type entities', ['@entity_type' => $lowercase_label]),
+      'plural' => $this->t('@entity_type entities', ['@entity_type' => $lowercase_label]),
     ];
   }
 
@@ -110,12 +114,12 @@ class EntityInlineForm implements InlineFormInterface {
   public function getTableFields($bundles) {
     $definitions = $this->entityFieldManager->getBaseFieldDefinitions($this->entityType->id());
     $label_key = $this->entityType->getKey('label');
-    $label_field_label = t('Label');
+    $label_field_label = $this->t('Label');
     if ($label_key && isset($definitions[$label_key])) {
       $label_field_label = $definitions[$label_key]->getLabel();
     }
     $bundle_key = $this->entityType->getKey('bundle');
-    $bundle_field_label = t('Type');
+    $bundle_field_label = $this->t('Type');
     if ($bundle_key && isset($definitions[$bundle_key])) {
       $bundle_field_label = $definitions[$bundle_key]->getLabel();
     }
@@ -183,6 +187,14 @@ class EntityInlineForm implements InlineFormInterface {
       }
     }
 
+    // Hide the log message field for revisionable entity types. It cannot be
+    // disabled in UI and does not make sense in inline entity form context.
+    if (($this->entityType instanceof ContentEntityTypeInterface)) {
+      if ($log_message_key = $this->entityType->getRevisionMetadataKey('revision_log_message')) {
+        $entity_form[$log_message_key]['#access'] = FALSE;
+      }
+    }
+
     // Determine the children of the entity form before it has been altered.
     $children_before = Element::children($entity_form);
 
@@ -242,7 +254,8 @@ class EntityInlineForm implements InlineFormInterface {
 
       foreach ($form_state->getErrors() as $name => $message) {
         // $name may be unknown in $form_state and
-        // $form_state->setErrorByName($name, $message) may suppress the error message.
+        // $form_state->setErrorByName($name, $message) may suppress the error
+        // message.
         $form_state->setError($triggering_element, $message);
       }
     }
@@ -290,7 +303,12 @@ class EntityInlineForm implements InlineFormInterface {
     // Invoke all specified builders for copying form values to entity fields.
     if (isset($entity_form['#entity_builders'])) {
       foreach ($entity_form['#entity_builders'] as $function) {
-        call_user_func_array($function, [$entity->getEntityTypeId(), $entity, &$entity_form, &$form_state]);
+        call_user_func_array($function, [
+          $entity->getEntityTypeId(),
+          $entity,
+          &$entity_form,
+          &$form_state,
+        ]);
       }
     }
   }
@@ -301,14 +319,15 @@ class EntityInlineForm implements InlineFormInterface {
    * After field_attach_submit() has run and the form has been closed, the form
    * state still contains field data in $form_state->get('field'). Unless that
    * data is removed, the next form with the same #parents (reopened add form,
-   * for example) will contain data (i.e. uploaded files) from the previous form.
+   * for example) will contain data (i.e. uploaded files) from the previous
+   * form.
    *
-   * @param $entity_form
+   * @param array $entity_form
    *   The entity form.
-   * @param $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The form state of the parent form.
    */
-  public static function submitCleanFormState(&$entity_form, FormStateInterface $form_state) {
+  public static function submitCleanFormState(array &$entity_form, FormStateInterface $form_state) {
     /** @var \Drupal\Core\Entity\EntityInterface $entity */
     $entity = $entity_form['#entity'];
     $bundle = $entity->bundle();
