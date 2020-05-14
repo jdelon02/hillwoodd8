@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\filefield_paths\Form\SettingsForm.
- */
-
 namespace Drupal\filefield_paths\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
@@ -43,7 +38,7 @@ class SettingsForm extends ConfigFormBase {
       '#type'          => 'textfield',
       '#default_value' => $this->config('filefield_paths.settings')
         ->get('temp_location'),
-      '#description'   => t('The location that unprocessed files will be uploaded priot to being processed by File (Field) Paths.<br />It is recommended that you use the temporary file system (temporary://) if your server configuration allows for that.'),
+      '#description'   => t('The location that unprocessed files will be uploaded prior to being processed by File (Field) Paths.<br />It is recommended that you use the temporary file system (temporary://) if your server configuration allows for that.'),
     );
 
     return parent::buildForm($form, $form_state);
