@@ -6,6 +6,8 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\Tests\entity_usage\Traits\EntityUsageLastEntityQueryTrait;
+use Drupal\file\Entity\File;
+use Drupal\media\Entity\Media;
 
 /**
  * Basic functional tests for the usage tracking of embedded content.
@@ -14,6 +16,7 @@ use Drupal\Tests\entity_usage\Traits\EntityUsageLastEntityQueryTrait;
  * - Entity Embed
  * - LinkIt
  * - HtmlLink.
+ * - MediaMedia WYSIWYG Embed (Core)
  *
  * @package Drupal\Tests\entity_usage\FunctionalJavascript
  *
@@ -375,24 +378,16 @@ class EmbeddedContentTest extends EntityUsageJavascriptTestBase {
     ]);
     $node6->save();
     // Check that both targets are tracked.
-    $usage = $usage_service->listTargets($node6);
-    $expected = [
-      'node' => [
-        $node5->id() => [
-          [
-            'method' => 'html_link',
-            'field_name' => 'field_eu_test_rich_text',
-            'count' => 1,
-          ],
-          [
-            'method' => 'html_link',
-            'field_name' => 'field_eu_test_normal_text',
-            'count' => 1,
-          ],
-        ],
-      ],
-    ];
-    $this->assertEquals($expected, $usage);
+    $usages = $usage_service->listTargets($node6);
+
+    // Asserting the whole array directly might fail due to different sort
+    // orders, depending on the PHP version.
+    $this->assertCount(2, $usages['node'][$node5->id()]);
+    foreach ($usages['node'][$node5->id()] as $usage) {
+      $this->assertEquals(1, $usage['count']);
+      $this->assertEquals('html_link', $usage['method']);
+      $this->assertContains($usage['field_name'], ['field_eu_test_rich_text', 'field_eu_test_normal_text']);
+    }
 
     // Create node 7 referencing node 6 using an aliased URL.
     $alias_url = '/i-am-an-alias';
@@ -416,6 +411,84 @@ class EmbeddedContentTest extends EntityUsageJavascriptTestBase {
             'source_langcode' => $node7->language()->getId(),
             'source_vid' => $node7->getRevisionId(),
             'method' => 'html_link',
+            'field_name' => 'field_eu_test_rich_text',
+            'count' => 1,
+          ],
+        ],
+      ],
+    ];
+    $this->assertEquals($expected, $usage);
+  }
+
+  /**
+   * Tests Media embed parsing.
+   */
+  public function testMediaEmbed() {
+    // Create media content.
+    $file = File::create([
+      'uri' => 'public://example.png',
+      'filename' => 'example.png',
+    ]);
+
+    $file->save();
+
+    $media = Media::create([
+      'bundle' => 'eu_test_image',
+      'field_media_image_1' => [
+        [
+          'target_id' => $file->id(),
+          'alt' => 'test alt',
+          'title' => 'test title',
+          'width' => 10,
+          'height' => 11,
+        ],
+      ],
+    ]);
+
+    $media->save();
+
+    /** @var \Drupal\entity_usage\EntityUsage $usage_service */
+    $usage_service = \Drupal::service('entity_usage.usage');
+
+    $usage = $usage_service->listSources($media);
+    $this->assertEquals([], $usage);
+
+    $embedded_text = '<drupal-media data-entity-type="media" data-entity-uuid="' . $media->uuid() . '"></drupal-media>';
+    $node1 = Node::create([
+      'type' => 'eu_test_ct',
+      'title' => 'Node 1',
+      'field_eu_test_rich_text' => [
+        'value' => $embedded_text,
+        'format' => 'eu_test_text_format',
+      ],
+    ]);
+
+    $node1->save();
+
+    $usage = $usage_service->listSources($media);
+
+    $expected = [
+      'node' => [
+        $node1->id() => [
+          [
+            'source_langcode' => $node1->language()->getId(),
+            'source_vid' => $node1->getRevisionId(),
+            'method' => 'media_embed',
+            'field_name' => 'field_eu_test_rich_text',
+            'count' => 1,
+          ],
+        ],
+      ],
+    ];
+
+    $this->assertEquals($expected, $usage);
+
+    $usage = $usage_service->listTargets($node1);
+    $expected = [
+      'media' => [
+        $media->id() => [
+          [
+            'method' => 'media_embed',
             'field_name' => 'field_eu_test_rich_text',
             'count' => 1,
           ],
