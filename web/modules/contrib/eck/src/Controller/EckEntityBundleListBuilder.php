@@ -49,7 +49,7 @@ class EckEntityBundleListBuilder extends ConfigEntityListBuilder {
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('entity_type.manager')->getStorage($entity_type->id()),
       $container->get('url_generator')
     );
   }
@@ -72,7 +72,7 @@ class EckEntityBundleListBuilder extends ConfigEntityListBuilder {
    */
   public function buildRow(EntityInterface $entity) {
     $row['title'] = [
-      'data' => $this->getLabel($entity),
+      'data' => $entity->label(),
       'class' => ['menu-label'],
     ];
     $row['description'] = Xss::filterAdmin($entity->description);
