@@ -7,7 +7,7 @@ use Drupal\webform\Entity\Webform;
 /**
  * Tests for webform wizard with access controls for pages.
  *
- * @group Webform
+ * @group webform
  */
 class WebformWizardAccessTest extends WebformWizardTestBase {
 

@@ -7,7 +7,7 @@ use Drupal\field\Entity\FieldConfig;
 /**
  * Tests for webform access.
  *
- * @group WebformAccess
+ * @group webform_access
  */
 class WebformAccessTest extends WebformAccessBrowserTestBase {
 

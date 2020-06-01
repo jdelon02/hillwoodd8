@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional;
 /**
  * Tests for webform help.
  *
- * @group Webform
+ * @group webform
  */
 class WebformHelpTest extends WebformBrowserTestBase {
 
@@ -19,7 +19,7 @@ class WebformHelpTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     $this->drupalPlaceBlock('help_block');

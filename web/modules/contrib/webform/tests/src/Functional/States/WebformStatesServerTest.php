@@ -10,7 +10,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform submission conditions (#states) validator.
  *
- * @group Webform
+ * @group webform
  */
 class WebformStatesServerTest extends WebformBrowserTestBase {
 
@@ -40,7 +40,7 @@ class WebformStatesServerTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     // Create filters.
@@ -350,7 +350,7 @@ class WebformStatesServerTest extends WebformBrowserTestBase {
 
     // Check no #states required errors.
     $this->postSubmission($webform);
-    $this->assertRaw('New submission added to Test: Form API #states custom pattern, less, and greater condition validation');
+    $this->assertRaw('New submission added to Test: Form API #states custom pattern, less, greater, and between condition validation.');
 
     $edit = [
       'trigger_pattern' => 'abc',
@@ -359,11 +359,23 @@ class WebformStatesServerTest extends WebformBrowserTestBase {
       'trigger_greater' => 11,
     ];
     $this->postSubmission($webform, $edit);
-    $this->assertNoRaw('New submission added to Test: Form API #states custom pattern, less, and greater condition validation');
+    $this->assertNoRaw('New submission added to Test: Form API #states custom pattern, less, greater, and between condition validation.');
     $this->assertRaw('dependent_pattern field is required.');
     $this->assertRaw('dependent_not_pattern field is required.');
     $this->assertRaw('dependent_less field is required.');
     $this->assertRaw('dependent_greater field is required.');
+
+    $edit = [
+      'trigger_between' => 9,
+    ];
+    $this->postSubmission($webform, $edit);
+    $this->assertNoRaw('dependent_between field is required.');
+
+    $edit = [
+      'trigger_between' => 21,
+    ];
+    $this->postSubmission($webform, $edit);
+    $this->assertNoRaw('dependent_between field is required.');
 
     /**************************************************************************/
     // multiple element.

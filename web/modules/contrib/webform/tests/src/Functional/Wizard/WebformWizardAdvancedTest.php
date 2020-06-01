@@ -8,7 +8,7 @@ use Drupal\Core\Serialization\Yaml;
 /**
  * Tests for webform advanced wizard.
  *
- * @group Webform
+ * @group webform
  */
 class WebformWizardAdvancedTest extends WebformWizardTestBase {
 
@@ -28,7 +28,7 @@ class WebformWizardAdvancedTest extends WebformWizardTestBase {
     // Get initial wizard start page (Your Information).
     $this->drupalGet('/webform/test_form_wizard_advanced');
     // Check progress bar is set to 'Your Information'.
-    $this->assertPattern('#<li data-webform-page="information" class="webform-progress-bar__page webform-progress-bar__page--current">\s+<b>Your Information</b><span></span></li>#');
+    $this->assertPattern('#<li data-webform-page="information" class="webform-progress-bar__page webform-progress-bar__page--current"><b>Your Information</b><span></span></li>#');
     // Check progress pages.
     $this->assertRaw('Page 1 of 5');
     // Check progress percentage.
@@ -50,8 +50,8 @@ class WebformWizardAdvancedTest extends WebformWizardTestBase {
     ];
     $this->drupalPostForm('/webform/test_form_wizard_advanced', $edit, t('Next Page >'));
     // Check progress bar is set to 'Contact Information'.
-    $this->assertPattern('#<li data-webform-page="information" class="webform-progress-bar__page webform-progress-bar__page--done">\s+<b>Your Information</b><span></span></li>#');
-    $this->assertPattern('#<li data-webform-page="contact" class="webform-progress-bar__page webform-progress-bar__page--current">\s+<b>Contact Information</b></li>#');
+    $this->assertPattern('#<li data-webform-page="information" class="webform-progress-bar__page webform-progress-bar__page--done"><b>Your Information</b><span></span></li>#');
+    $this->assertPattern('#<li data-webform-page="contact" class="webform-progress-bar__page webform-progress-bar__page--current"><b>Contact Information</b></li>#');
     // Check progress pages.
     $this->assertRaw('Page 2 of 5');
     // Check progress percentage.
@@ -73,7 +73,7 @@ class WebformWizardAdvancedTest extends WebformWizardTestBase {
     ];
     $this->drupalPostForm(NULL, $edit, t('< Previous Page'));
     // Check progress bar is set to 'Your Information'.
-    $this->assertPattern('#<li data-webform-page="information" class="webform-progress-bar__page webform-progress-bar__page--current">\s+<b>Your Information</b><span></span></li>#');
+    $this->assertPattern('#<li data-webform-page="information" class="webform-progress-bar__page webform-progress-bar__page--current"><b>Your Information</b><span></span></li>#');
     // Check nosave class.
     $this->assertRaw('js-webform-unsaved');
     // Check no nosave attributes.

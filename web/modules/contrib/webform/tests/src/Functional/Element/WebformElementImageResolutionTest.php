@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for webform image resolution element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementImageResolutionTest extends WebformElementBrowserTestBase {
 

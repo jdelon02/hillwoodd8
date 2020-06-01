@@ -8,7 +8,7 @@ use Drupal\webform\Entity\Webform;
 /**
  * Tests for webform HTML editor element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementHtmlEditorTest extends WebformElementBrowserTestBase {
 
@@ -29,7 +29,7 @@ class WebformElementHtmlEditorTest extends WebformElementBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     // Create filters.
@@ -138,14 +138,7 @@ class WebformElementHtmlEditorTest extends WebformElementBrowserTestBase {
     $this->drupalGet('/admin/structure/webform/manage/contact/handlers/email_confirmation/edit');
     $this->assertNoRaw('<textarea data-drupal-selector="edit-settings-body-custom-html-value" class="js-html-editor form-textarea resize-vertical" id="edit-settings-body-custom-html-value" name="settings[body_custom_html][value]" rows="5" cols="60">');
     $this->assertRaw('<textarea data-drupal-selector="edit-settings-body-custom-html-value-value" id="edit-settings-body-custom-html-value-value" name="settings[body_custom_html][value][value]" rows="5" cols="60" class="form-textarea resize-vertical">');
-    // @todo Remove once Drupal 8.8.x is only supported.
-    if (floatval(\Drupal::VERSION) >= 8.8) {
-      $this->assertRaw('<div class="js-filter-wrapper filter-wrapper js-form-wrapper form-wrapper" data-drupal-selector="edit-settings-body-custom-html-value-format" id="edit-settings-body-custom-html-value-format">');
-    }
-    else {
-      $this->assertRaw('<div class="filter-wrapper js-form-wrapper form-wrapper" data-drupal-selector="edit-settings-body-custom-html-value-format" id="edit-settings-body-custom-html-value-format">');
-    }
-
+    $this->assertRaw('<div class="js-filter-wrapper filter-wrapper js-form-wrapper form-wrapper" data-drupal-selector="edit-settings-body-custom-html-value-format" id="edit-settings-body-custom-html-value-format">');
   }
 
 }

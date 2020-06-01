@@ -6,6 +6,7 @@
  */
 
 use Drupal\Component\Utility\Unicode;
+use Drupal\Core\Config\Entity\ThirdPartySettingsInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -39,8 +40,9 @@ function filefield_paths_entity_base_field_info(\Drupal\Core\Entity\EntityTypeIn
 function filefield_paths_form_field_config_edit_form_alter(array &$form, FormStateInterface $form_state) {
   /** @var Drupal\field\Entity\FieldConfig $field */
   $field = $form_state->getFormObject()->getEntity();
+  $class = $field->getClass();
 
-  if ($field->getClass() == '\Drupal\file\Plugin\Field\FieldType\FileFieldItemList') {
+  if (class_exists($class) && new $class($field->getItemDefinition()) instanceof FileFieldItemList) {
     $entity_info = \Drupal::entityTypeManager()
       ->getDefinition($field->getTargetEntityTypeId());
     $settings = $field->getThirdPartySettings('filefield_paths');
@@ -94,12 +96,16 @@ function filefield_paths_form_field_config_edit_form_alter(array &$form, FormSta
         foreach (array_keys($settings_field['form']) as $delta => $key) {
           $form['settings']['filefield_paths']['details'][$name][$key] = $settings_field['form'][$key];
           if (\Drupal::moduleHandler()->moduleExists('token')) {
-            // @TODO - Token reporting Drupal default tokens are invalid.
-            //$form['settings']['filefield_paths']['details'][$name][$key]['#element_validate'][] = 'token_element_validate';
-            //$form['settings']['filefield_paths']['details'][$name][$key]['#token_types'] = array(
-            //  'file',
-            //  $entity_info->get('token type'),
-            //);
+            $form['settings']['filefield_paths']['details'][$name][$key]['#element_validate'][] = 'token_element_validate';
+            $form['settings']['filefield_paths']['details'][$name][$key]['#token_types'] = [
+              'date',
+              'file',
+            ];
+            $token_type = \Drupal::service('token.entity_mapper')
+              ->getTokenTypeForEntityType($entity_info->id());
+            if (!empty($token_type)) {
+              $form['settings']['filefield_paths']['details'][$name][$key]['#token_types'][] = $token_type;
+            }
           }
 
           // Fetch stored value from instance.
@@ -155,11 +161,13 @@ function filefield_paths_form_field_config_edit_form_alter(array &$form, FormSta
         // Replacement patterns for field.
         if (\Drupal::moduleHandler()->moduleExists('token')) {
           $form['settings']['filefield_paths']['details']['token_tree'] = [
-            '#theme'       => 'token_tree',
-            '#token_types' => ['file', $entity_info->get('token type')],
-            '#dialog'      => TRUE,
+            '#theme'       => 'token_tree_link',
+            '#token_types' => ['file'],
             '#weight'      => 10,
           ];
+          if (!empty($token_type)) {
+            $form['settings']['filefield_paths']['details']['token_tree']['#token_types'][] = $token_type;
+          }
         }
 
         // Redirect.
@@ -344,13 +352,16 @@ function filefield_paths_entity_update(EntityInterface $entity) {
       if ($field instanceof FileFieldItemList) {
         /** @var FieldConfig $definition */
         $definition = $field->getFieldDefinition();
-        $settings = $definition->getThirdPartySettings('filefield_paths');
-        if (isset($settings['enabled']) && $settings['enabled']) {
-          // Invoke hook_filefield_paths_process_file().
-          foreach (\Drupal::moduleHandler()
-                     ->getImplementations('filefield_paths_process_file') as $module) {
-            if (function_exists($function = "{$module}_filefield_paths_process_file")) {
-              $function($entity, $field, $settings);
+        // Ignore base fields.
+        if ($definition instanceof ThirdPartySettingsInterface) {
+          $settings = $definition->getThirdPartySettings('filefield_paths');
+          if (isset($settings['enabled']) && $settings['enabled']) {
+            // Invoke hook_filefield_paths_process_file().
+            foreach (\Drupal::moduleHandler()
+                       ->getImplementations('filefield_paths_process_file') as $module) {
+              if (function_exists($function = "{$module}_filefield_paths_process_file")) {
+                $function($entity, $field, $settings);
+              }
             }
           }
         }

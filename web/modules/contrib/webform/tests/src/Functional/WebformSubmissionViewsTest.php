@@ -7,7 +7,7 @@ use Drupal\webform\Entity\Webform;
 /**
  * Tests for webform submission views integration.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSubmissionViewsTest extends WebformBrowserTestBase {
 

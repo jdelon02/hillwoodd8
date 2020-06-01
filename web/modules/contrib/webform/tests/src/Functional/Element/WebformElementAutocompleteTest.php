@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for webform autocomplete element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementAutocompleteTest extends WebformElementBrowserTestBase {
 
@@ -45,13 +45,7 @@ class WebformElementAutocompleteTest extends WebformElementBrowserTestBase {
 
     // Check #autocomplete_items just one character.
     $this->drupalGet('/webform/test_element_autocomplete/autocomplete/autocomplete_items', ['query' => ['q' => 'U']]);
-    // @todo Remove once Drupal 8.8.x is only supported.
-    if (floatval(\Drupal::VERSION) >= 8.8) {
-      $this->assertRaw('[{"value":"Anguilla","label":"Anguilla"},{"value":"Antigua \u0026 Barbuda","label":"Antigua \u0026 Barbuda"},{"value":"Aruba","label":"Aruba"},{"value":"Australia","label":"Australia"},{"value":"Austria","label":"Austria"}]');
-    }
-    else {
-      $this->assertRaw('[{"value":"Anguilla","label":"Anguilla"},{"value":"Antigua and Barbuda","label":"Antigua and Barbuda"},{"value":"Aruba","label":"Aruba"},{"value":"Australia","label":"Australia"},{"value":"Austria","label":"Austria"}]');
-    }
+    $this->assertRaw('[{"value":"Anguilla","label":"Anguilla"},{"value":"Antigua \u0026 Barbuda","label":"Antigua \u0026 Barbuda"},{"value":"Aruba","label":"Aruba"},{"value":"Australia","label":"Australia"},{"value":"Austria","label":"Austria"}]');
 
     /* Test #autocomplete_existing element property */
 

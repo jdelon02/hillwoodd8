@@ -8,7 +8,7 @@ use Drupal\webform\WebformInterface;
 /**
  * Tests for webform element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementTest extends WebformElementBrowserTestBase {
 

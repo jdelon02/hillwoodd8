@@ -8,7 +8,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform states wizard server.
  *
- * @group Webform
+ * @group webform
  */
 class WebformStatesWizardTest extends WebformBrowserTestBase {
 

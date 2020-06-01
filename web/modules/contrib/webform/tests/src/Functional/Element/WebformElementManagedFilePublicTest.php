@@ -7,7 +7,7 @@ namespace Drupal\Tests\webform\Functional\Element;
  *
  * @see https://www.drupal.org/psa-2016-003
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementManagedFilePublicTest extends WebformElementBrowserTestBase {
 
@@ -28,7 +28,7 @@ class WebformElementManagedFilePublicTest extends WebformElementBrowserTestBase 
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     // Set public file upload support for testing.

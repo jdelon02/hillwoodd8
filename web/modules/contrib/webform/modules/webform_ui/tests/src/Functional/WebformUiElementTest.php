@@ -8,7 +8,7 @@ use Drupal\webform\Entity\Webform;
 /**
  * Tests for webform UI element.
  *
- * @group WebformUi
+ * @group webform_ui
  */
 class WebformUiElementTest extends WebformBrowserTestBase {
 
@@ -29,7 +29,7 @@ class WebformUiElementTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     // Disable description help icon.
     $this->config('webform.settings')->set('ui.description_help', FALSE)->save();
