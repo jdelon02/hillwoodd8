@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for webform submission views element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementSubmissionViewsTest extends WebformElementBrowserTestBase {
 

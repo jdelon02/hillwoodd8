@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for rating element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementRatingTest extends WebformElementBrowserTestBase {
 

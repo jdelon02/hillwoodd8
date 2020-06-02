@@ -10,7 +10,7 @@ use Drupal\webform\WebformInterface;
 /**
  * Tests for webform path and page.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSettingsPathTest extends WebformBrowserTestBase {
 
@@ -20,8 +20,8 @@ class WebformSettingsPathTest extends WebformBrowserTestBase {
    * Tests YAML page and title.
    */
   public function testPaths() {
-    /** @var \Drupal\Core\Path\AliasStorageInterface $alias_storage */
-    $alias_storage = $this->container->get('path.alias_storage');
+    /** @var \Drupal\path_alias\AliasRepositoryInterface $path_alias_repository */
+    $path_alias_repository = $this->container->get('path_alias.repository');
 
     $node = $this->drupalCreateNode();
 
@@ -47,10 +47,10 @@ class WebformSettingsPathTest extends WebformBrowserTestBase {
     $this->drupalLogin($this->rootUser);
 
     // Check that aliases exist.
-    $this->assert(is_array($alias_storage->load(['alias' => $form_path])));
-    $this->assert(is_array($alias_storage->load(['alias' => "$form_path/confirmation"])));
-    $this->assert(is_array($alias_storage->load(['alias' => "$form_path/drafts"])));
-    $this->assert(is_array($alias_storage->load(['alias' => "$form_path/submissions"])));
+    $this->assertIsArray($path_alias_repository->lookupByAlias($form_path, 'en'));
+    $this->assertIsArray($path_alias_repository->lookupByAlias("$form_path/confirmation", 'en'));
+    $this->assertIsArray($path_alias_repository->lookupByAlias("$form_path/drafts", 'en'));
+    $this->assertIsArray($path_alias_repository->lookupByAlias("$form_path/submissions", 'en'));
 
     // Check default system submit path.
     $this->drupalGet($webform_path);
@@ -78,10 +78,10 @@ class WebformSettingsPathTest extends WebformBrowserTestBase {
     $webform->setSettings(['page' => FALSE])->save();
 
     // Check that aliases do not exist.
-    $this->assertFalse($alias_storage->load(['alias' => $form_path]));
-    $this->assertFalse($alias_storage->load(['alias' => "$form_path/confirmation"]));
-    $this->assertFalse($alias_storage->load(['alias' => "$form_path/drafts"]));
-    $this->assertFalse($alias_storage->load(['alias' => "$form_path/submissions"]));
+    $this->assertNull($path_alias_repository->lookupByAlias($form_path, 'en'));
+    $this->assertNull($path_alias_repository->lookupByAlias("$form_path/confirmation", 'en'));
+    $this->assertNull($path_alias_repository->lookupByAlias("$form_path/drafts", 'en'));
+    $this->assertNull($path_alias_repository->lookupByAlias("$form_path/submissions", 'en'));
 
     // Check page hidden (i.e. access denied).
     $this->drupalGet($webform_path);
@@ -181,7 +181,7 @@ class WebformSettingsPathTest extends WebformBrowserTestBase {
     $this->assertNoRaw('seven');
 
     // Install Seven and set it as the default admin theme.
-    \Drupal::service('theme_handler')->install(['seven']);
+    \Drupal::service('theme_installer')->install(['seven']);
 
     $edit = [
       'admin_theme' => 'seven',

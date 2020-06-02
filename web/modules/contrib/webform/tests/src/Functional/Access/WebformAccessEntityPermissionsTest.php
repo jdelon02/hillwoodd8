@@ -8,7 +8,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform entity permissions.
  *
- * @group Webform
+ * @group webform
  */
 class WebformAccessEntityPermissionsTest extends WebformBrowserTestBase {
 

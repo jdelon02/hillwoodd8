@@ -8,7 +8,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform states preview.
  *
- * @group Webform
+ * @group webform
  */
 class WebformStatesPreviewTest extends WebformBrowserTestBase {
 

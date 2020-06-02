@@ -8,7 +8,7 @@ use Drupal\webform\Utility\WebformYaml;
 /**
  * Tests for webform entity.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSettingsAdminTest extends WebformBrowserTestBase {
 
@@ -29,7 +29,7 @@ class WebformSettingsAdminTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     $this->drupalPlaceBlock('local_actions_block');
   }

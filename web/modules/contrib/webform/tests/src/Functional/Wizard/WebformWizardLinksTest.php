@@ -7,7 +7,7 @@ use Drupal\webform\Entity\Webform;
 /**
  * Tests for webform wizard progress and preview links.
  *
- * @group Webform
+ * @group webform
  */
 class WebformWizardLinksTest extends WebformWizardTestBase {
 

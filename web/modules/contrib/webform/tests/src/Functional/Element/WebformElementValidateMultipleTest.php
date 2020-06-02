@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for webform validate multiple.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementValidateMultipleTest extends WebformElementBrowserTestBase {
 

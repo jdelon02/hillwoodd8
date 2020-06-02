@@ -8,7 +8,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for email webform handler email states.
  *
- * @group Webform
+ * @group webform
  */
 class WebformHandlerEmailStatesTest extends WebformBrowserTestBase {
 

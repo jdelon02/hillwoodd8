@@ -10,7 +10,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for confidential webform submissions.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSettingsConfidentialTest extends WebformBrowserTestBase {
 

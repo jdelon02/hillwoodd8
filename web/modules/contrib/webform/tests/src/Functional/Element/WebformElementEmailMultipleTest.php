@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for email_multiple element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementEmailMultipleTest extends WebformElementBrowserTestBase {
 

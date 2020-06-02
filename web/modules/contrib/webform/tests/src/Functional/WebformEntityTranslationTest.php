@@ -8,7 +8,7 @@ use Drupal\webform\Entity\Webform;
 /**
  * Tests for webform translation.
  *
- * @group Webform
+ * @group webform
  */
 class WebformEntityTranslationTest extends WebformBrowserTestBase {
 
@@ -22,7 +22,7 @@ class WebformEntityTranslationTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     // Place blocks.

@@ -9,7 +9,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform submission form limits.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSettingsLimitsTest extends WebformBrowserTestBase {
 
@@ -30,7 +30,7 @@ class WebformSettingsLimitsTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     // Place webform test blocks.

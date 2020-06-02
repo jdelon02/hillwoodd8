@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for webform terms of service element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementTermsOfServiceTest extends WebformElementBrowserTestBase {
 

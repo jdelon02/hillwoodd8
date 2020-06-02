@@ -7,7 +7,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for composite elements.
  *
- * @group Webform
+ * @group webform
  */
 class WebformCompositeTest extends WebformBrowserTestBase {
 

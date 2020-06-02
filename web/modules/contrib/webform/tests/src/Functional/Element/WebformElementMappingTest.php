@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for mapping element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementMappingTest extends WebformElementBrowserTestBase {
 

@@ -10,7 +10,7 @@ use Drupal\webform\WebformInterface;
 /**
  * Tests for webform storage tests.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSubmissionStorageTest extends WebformBrowserTestBase {
 
