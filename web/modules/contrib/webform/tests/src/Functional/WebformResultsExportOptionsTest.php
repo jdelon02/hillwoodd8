@@ -7,7 +7,7 @@ use Drupal\webform\Entity\Webform;
 /**
  * Tests for webform results export.
  *
- * @group Webform
+ * @group webform
  */
 class WebformResultsExportOptionsTest extends WebformBrowserTestBase {
 

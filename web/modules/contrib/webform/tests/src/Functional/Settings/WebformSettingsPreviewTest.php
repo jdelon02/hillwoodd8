@@ -8,7 +8,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform submission form preview.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSettingsPreviewTest extends WebformBrowserTestBase {
 
@@ -22,7 +22,7 @@ class WebformSettingsPreviewTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     // Exclude Progress tracker so that the default progress bar is displayed.

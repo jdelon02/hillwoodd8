@@ -8,7 +8,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform settings behaviors.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSettingsBehaviorsTest extends WebformBrowserTestBase {
 
@@ -33,7 +33,7 @@ class WebformSettingsBehaviorsTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     // Disable description help icon.
     $this->config('webform.settings')->set('ui.description_help', FALSE)->save();
@@ -223,7 +223,7 @@ class WebformSettingsBehaviorsTest extends WebformBrowserTestBase {
     // Check novalidate checkbox is enabled.
     $this->drupalGet('/admin/structure/webform/manage/test_form_novalidate/settings/form');
     $this->assertRaw('<input data-drupal-selector="edit-form-novalidate" aria-describedby="edit-form-novalidate--description" type="checkbox" id="edit-form-novalidate" name="form_novalidate" value class="form-checkbox" />');
-    $this->assertRaw('If checked, the <a href="http://www.w3schools.com/tags/att_form_novalidate.asp">novalidate</a> attribute, which disables client-side validation, will be added to this form.');
+    $this->assertRaw('If checked, the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form">novalidate</a> attribute, which disables client-side validation, will be added to this form.');
 
     // Check webform no longer has novalidate attribute.
     $this->drupalGet('/webform/test_form_novalidate');
@@ -236,7 +236,7 @@ class WebformSettingsBehaviorsTest extends WebformBrowserTestBase {
 
     // Check novalidate checkbox is disabled.
     $this->drupalGet('/admin/structure/webform/manage/test_form_novalidate/settings/form');
-    $this->assertNoRaw('If checked, the <a href="http://www.w3schools.com/tags/att_form_novalidate.asp">novalidate</a> attribute, which disables client-side validation, will be added to this form.');
+    $this->assertNoRaw('If checked, the <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/form">novalidate</a> attribute, which disables client-side validation, will be added to this form.');
     $this->assertRaw('<input data-drupal-selector="edit-form-novalidate-disabled" aria-describedby="edit-form-novalidate-disabled--description" disabled="disabled" type="checkbox" id="edit-form-novalidate-disabled" name="form_novalidate_disabled" value="1" checked="checked" class="form-checkbox" />');
     $this->assertRaw('Client-side validation is disabled for all forms.');
 

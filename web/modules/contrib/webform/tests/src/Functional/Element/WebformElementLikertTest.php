@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for likert element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementLikertTest extends WebformElementBrowserTestBase {
 

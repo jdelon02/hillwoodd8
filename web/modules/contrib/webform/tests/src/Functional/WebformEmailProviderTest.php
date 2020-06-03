@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional;
 /**
  * Tests for webform email provider.
  *
- * @group Webform
+ * @group webform
  */
 class WebformEmailProviderTest extends WebformBrowserTestBase {
 

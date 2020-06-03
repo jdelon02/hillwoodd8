@@ -7,7 +7,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform token element validation.
  *
- * @group Webform
+ * @group webform
  */
 class WebformTokenValidateTest extends WebformBrowserTestBase {
 

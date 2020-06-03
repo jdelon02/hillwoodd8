@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for webform element #states.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementStatesTest extends WebformElementBrowserTestBase {
 

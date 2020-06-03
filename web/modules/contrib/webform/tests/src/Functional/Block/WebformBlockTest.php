@@ -7,7 +7,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform block.
  *
- * @group Webform
+ * @group webform
  */
 class WebformBlockTest extends WebformBrowserTestBase {
 

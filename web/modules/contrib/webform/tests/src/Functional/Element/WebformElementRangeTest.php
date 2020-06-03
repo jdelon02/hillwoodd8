@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for range element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementRangeTest extends WebformElementBrowserTestBase {
 

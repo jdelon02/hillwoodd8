@@ -9,7 +9,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for webform submission serial number.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSettingsSerialTest extends WebformBrowserTestBase {
 

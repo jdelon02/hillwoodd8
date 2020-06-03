@@ -10,7 +10,7 @@ use Drupal\webform\Entity\WebformSubmission;
 /**
  * Tests for text format element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementTextFormatTest extends WebformElementBrowserTestBase {
 
@@ -40,7 +40,7 @@ class WebformElementTextFormatTest extends WebformElementBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     $this->fileUsage = $this->container->get('file.usage');
@@ -54,13 +54,7 @@ class WebformElementTextFormatTest extends WebformElementBrowserTestBase {
 
     // Check that formats and tips are removed and/or hidden.
     $this->drupalGet('/webform/test_element_text_format');
-    // @todo Remove once Drupal 8.8.x is only supported.
-    if (floatval(\Drupal::VERSION) >= 8.8) {
-      $this->assertRaw('<div class="js-filter-wrapper filter-wrapper js-form-wrapper form-wrapper" data-drupal-selector="edit-text-format-format" style="display: none" id="edit-text-format-format">');
-    }
-    else {
-      $this->assertRaw('<div class="filter-wrapper js-form-wrapper form-wrapper" data-drupal-selector="edit-text-format-format" style="display: none" id="edit-text-format-format">');
-    }
+    $this->assertRaw('<div class="js-filter-wrapper filter-wrapper js-form-wrapper form-wrapper" data-drupal-selector="edit-text-format-format" style="display: none" id="edit-text-format-format">');
     $this->assertRaw('<div class="filter-help js-form-wrapper form-wrapper" data-drupal-selector="edit-text-format-format-help" style="display: none" id="edit-text-format-format-help">');
 
     // Check description + more.

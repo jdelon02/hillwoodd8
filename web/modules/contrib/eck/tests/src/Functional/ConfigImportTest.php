@@ -3,10 +3,9 @@
 namespace Drupal\Tests\eck\Functional;
 
 use Drupal\Core\Url;
-use Drupal\simpletest\WebTestBase;
 
 /**
- * Class ConfigImportTest
+ * Class ConfigImportTest.
  *
  * @group eck
  */
@@ -43,6 +42,9 @@ class ConfigImportTest extends FunctionalTestBase {
     }
   }
 
+  /**
+   * Tests the import of configuration.
+   */
   public function testImport() {
     $defaultLanguage = \Drupal::languageManager()->getDefaultLanguage();
 
@@ -103,7 +105,7 @@ class ConfigImportTest extends FunctionalTestBase {
     $route = 'eck.entity.add';
     $routeArguments = [
       'eck_entity_type' => 'test_entity',
-      'eck_entity_bundle' => 'bundle'
+      'eck_entity_bundle' => 'bundle',
     ];
     $this->drupalPostForm(Url::fromRoute($route, $routeArguments), $edit, t('Save'));
     $this->assertSession()->responseContains($edit['title[0][value]']);

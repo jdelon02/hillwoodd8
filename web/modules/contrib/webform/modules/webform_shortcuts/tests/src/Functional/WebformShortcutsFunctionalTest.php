@@ -7,7 +7,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Webform shortcuts test.
  *
- * @group webform_browser
+ * @group webform_shortcuts
  */
 class WebformShortcutsFunctionalTest extends WebformBrowserTestBase {
 
@@ -24,7 +24,7 @@ class WebformShortcutsFunctionalTest extends WebformBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
     $this->placeBlocks();
   }

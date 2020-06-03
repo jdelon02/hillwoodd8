@@ -5,7 +5,7 @@ namespace Drupal\Tests\webform\Functional\Element;
 /**
  * Tests for email_confirm element.
  *
- * @group Webform
+ * @group webform
  */
 class WebformElementEmailConfirmTest extends WebformElementBrowserTestBase {
 

@@ -10,7 +10,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for disable tracking of remote IP address.
  *
- * @group Webform
+ * @group webform
  */
 class WebformSettingsRemoteAddrTest extends WebformBrowserTestBase {
 

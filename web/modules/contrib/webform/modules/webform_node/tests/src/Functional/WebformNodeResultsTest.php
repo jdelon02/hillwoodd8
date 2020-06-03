@@ -10,7 +10,7 @@ use Drupal\webform\WebformInterface;
 /**
  * Tests for webform node results.
  *
- * @group WebformNode
+ * @group webform_node
  */
 class WebformNodeResultsTest extends WebformNodeBrowserTestBase {
 
@@ -24,7 +24,7 @@ class WebformNodeResultsTest extends WebformNodeBrowserTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setUp() {
+  protected function setUp() {
     parent::setUp();
 
     // Place blocks.
