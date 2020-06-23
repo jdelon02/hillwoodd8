@@ -2,7 +2,7 @@
  * @file
  * Select2 integration.
  */
-(function ($, drupalSettings) {
+(function ($, drupalSettings, Sortable) {
   'use strict';
 
   Drupal.behaviors.select2 = {
@@ -18,6 +18,14 @@
             id: '$ID:' + term,
             text: term
           };
+        };
+        config.templateSelection = function (option, container) {
+          // The placeholder doesn't have value.
+          if ('element' in option && 'value' in option.element) {
+            // Add option value to selection container for sorting.
+            $(container).data('optionValue', option.element.value);
+          }
+          return option.text;
         };
         $(this).data('select2-config', config);
 
@@ -35,19 +43,15 @@
         $(this).select2(config);
 
         // Copied from https://github.com/woocommerce/woocommerce/blob/master/assets/js/admin/wc-enhanced-select.js#L118
-        if (Object.prototype.hasOwnProperty.call(config, 'ajax')) {
+        if (Object.prototype.hasOwnProperty.call(config, 'ajax') && config.multiple) {
           var $select = $(this);
-          var $list = $(this).next('.select2-container').find('ul.select2-selection__rendered');
-          $list.sortable({
-            placeholder: 'ui-state-highlight select2-selection__choice',
-            forcePlaceholderSize: true,
-            items: 'li:not(.select2-search__field)',
-            tolerance: 'pointer',
-            stop: function () {
+          var $list = $select.next('.select2-container').find('ul.select2-selection__rendered');
+          Sortable.create($list[0], {
+            draggable: 'li:not(.select2-search)',
+            forceFallback: true,
+            onEnd: function () {
               $($list.find('.select2-selection__choice').get().reverse()).each(function () {
-                var id = $(this).data('data').id;
-                var option = $select.find('option[value="' + id + '"]')[0];
-                $select.prepend(option);
+                $select.prepend($select.find('option[value="' + $(this).data('optionValue') + '"]').first());
               });
             }
           });
@@ -56,4 +60,4 @@
     }
   };
 
-})(jQuery, drupalSettings);
+})(jQuery, drupalSettings, Sortable);
