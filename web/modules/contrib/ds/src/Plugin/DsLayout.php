@@ -3,6 +3,7 @@
 namespace Drupal\ds\Plugin;
 
 use Drupal\Component\Utility\Xss;
+use Drupal\Core\Entity\EntityFormInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Layout\LayoutDefault;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -122,10 +123,18 @@ class DsLayout extends LayoutDefault implements PluginFormInterface {
           ],
         ],
       ];
+
+      $token_types = 'all';
+      // The entity is not always available.
+      // See https://www.drupal.org/project/ds/issues/3137198.
+      if (($form_object = $form_state->getFormObject()) && $form_object instanceof EntityFormInterface && ($entity = $form_object->getEntity())) {
+        $token_types = [$entity->getTargetEntityTypeId()];
+      }
+
       $form['region_wrapper']['tokens']['help'] = [
         '#theme' => 'token_tree_link',
-        '#token_types' => 'all',
-        '#global_types' => FALSE,
+        '#token_types' => $token_types,
+        '#global_types' => TRUE,
         '#dialog' => TRUE,
       ];
     }
