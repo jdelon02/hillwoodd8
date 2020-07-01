@@ -35,6 +35,11 @@ class ConfigEntityTrackingTest extends EntityUsageJavascriptTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'classy';
+
+  /**
+   * {@inheritdoc}
+   */
   public function setUp() {
     parent::setUp();
 
@@ -80,12 +85,12 @@ class ConfigEntityTrackingTest extends EntityUsageJavascriptTestBase {
     ])->save();
 
     // Define our widget and formatter for this field.
-    entity_get_form_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_webforms', [
         'type' => 'entity_reference_autocomplete',
       ])
       ->save();
-    entity_get_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_webforms', [
         'type' => 'entity_reference_label',
       ])
@@ -171,12 +176,12 @@ class ConfigEntityTrackingTest extends EntityUsageJavascriptTestBase {
     ])->save();
 
     // Define our widget and formatter for this field.
-    entity_get_form_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_views', [
         'type' => 'block_field_default',
       ])
       ->save();
-    entity_get_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_views', [
         'type' => 'block_field',
       ])
@@ -284,12 +289,12 @@ class ConfigEntityTrackingTest extends EntityUsageJavascriptTestBase {
     ])->save();
 
     // Define our widget and formatter for this field.
-    entity_get_form_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_blocks', [
         'type' => 'block_field_default',
       ])
       ->save();
-    entity_get_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_blocks', [
         'type' => 'block_field',
       ])
