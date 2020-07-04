@@ -23,13 +23,13 @@ class WebformActions extends ContainerBase {
   /**
    * {@inheritdoc}
    */
-  public function getDefaultProperties() {
+  protected function defineDefaultProperties() {
     $properties = [
       // Title.
       'title' => '',
       // Attributes.
       'attributes' => [],
-    ] + $this->getDefaultBaseProperties();
+    ] + $this->defineDefaultBaseProperties();
     foreach (WebformActionsElement::$buttons as $button) {
       $properties[$button . '_hide'] = FALSE;
       $properties[$button . '__label'] = '';
@@ -37,6 +37,8 @@ class WebformActions extends ContainerBase {
     }
     return $properties;
   }
+
+  /****************************************************************************/
 
   /**
    * {@inheritdoc}
@@ -109,10 +111,10 @@ class WebformActions extends ContainerBase {
       '#type' => 'fieldset',
       '#title' => $this->t('Buttons'),
     ];
-    $draft_enabled = ($webform->getSetting('draft') != WebformInterface::DRAFT_NONE);
+    $draft_enabled = ($webform->getSetting('draft') !== WebformInterface::DRAFT_NONE);
     $reset_enabled = $webform->getSetting('form_reset');
     $wizard_enabled = $webform->hasWizardPages();
-    $preview_enabled = ($webform->getSetting('preview') != DRUPAL_DISABLED);
+    $preview_enabled = ($webform->getSetting('preview') !== DRUPAL_DISABLED);
 
     $buttons = [
       'submit' => [
@@ -129,6 +131,12 @@ class WebformActions extends ContainerBase {
         'title' => $this->t('Draft'),
         'label' => $this->t('draft'),
         'access' => $draft_enabled,
+      ],
+      'update' => [
+        'title' => $this->t('Update'),
+        'label' => $this->t('Update'),
+        'description' => $this->t('This is used after a submission has been saved and finalized to the database.'),
+        'access' => !$webform->isResultsDisabled(),
       ],
       'wizard_prev' => [
         'title' => $this->t('Wizard previous'),
