@@ -4,7 +4,6 @@ namespace Drupal\blazy\Dejavu;
 
 use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Render\Markup;
-use Drupal\image\Plugin\Field\FieldType\ImageItem;
 use Drupal\blazy\Blazy;
 use Drupal\blazy\BlazyDefault;
 
@@ -42,6 +41,13 @@ trait BlazyStyleBaseTrait {
   }
 
   /**
+   * Prepares commons settings for the style plugins.
+   */
+  protected function prepareSettings(array &$settings = []) {
+    // Do nothing to let extenders modify.
+  }
+
+  /**
    * Provides commons settings for the style plugins.
    */
   protected function buildSettings() {
@@ -60,6 +66,8 @@ trait BlazyStyleBaseTrait {
       ],
     ] + BlazyDefault::lazySettings();
 
+    $this->prepareSettings($settings);
+
     // Prepare needed settings to work with.
     $settings['check_blazy']       = TRUE;
     $settings['id']                = $id;
@@ -68,7 +76,7 @@ trait BlazyStyleBaseTrait {
     $settings['current_view_mode'] = $view_mode;
     $settings['instance_id']       = $instance;
     $settings['multiple']          = TRUE;
-    $settings['plugin_id']         = $plugin_id;
+    $settings['plugin_id']         = $settings['view_plugin_id'] = $plugin_id;
     $settings['use_ajax']          = $view->ajaxEnabled();
     $settings['view_name']         = $view_name;
     $settings['view_display']      = $view->style_plugin->displayHandler->getPluginId();
@@ -77,6 +85,8 @@ trait BlazyStyleBaseTrait {
     if (!empty($this->htmlSettings)) {
       $settings = NestedArray::mergeDeep($settings, $this->htmlSettings);
     }
+
+    $this->blazyManager()->getCommonSettings($settings);
 
     $this->blazyManager()->getModuleHandler()->alter('blazy_settings_views', $settings, $view);
     return $settings;
@@ -91,26 +101,32 @@ trait BlazyStyleBaseTrait {
   }
 
   /**
-   * Returns the first Blazy formatter found.
+   * Returns the first Blazy formatter found, to save image dimensions once.
+   *
+   * Given 100 images on a page, Blazy will call
+   * ImageStyle::transformDimensions() once rather than 100 times and let the
+   * 100 images inherit it as long as the image style has CROP in the name.
    */
   public function getFirstImage($row) {
     if (!isset($this->firstImage)) {
       $rendered = [];
-      if ($row && isset($row->_entity) && $fields = $row->_entity->getFields(FALSE)) {
-        foreach ($fields as $field) {
-          if ($field->getFieldDefinition()->getFieldStorageDefinition()->getSetting('target_type') == 'media') {
-            $name = $field->getName();
-            break;
-          }
-          if ($field->first() instanceof ImageItem) {
-            $name = $field->getName();
-            break;
-          }
-        }
+      if ($row && $render = $this->view->rowPlugin->render($row)) {
+        if (isset($render['#view']->field) && $fields = $render['#view']->field) {
+          foreach ($fields as $field) {
+            $options = isset($field->options) ? $field->options : [];
+            if (!isset($options['type'])) {
+              continue;
+            }
 
-        if (isset($name) && $rendered = $this->getFieldRenderable($row, 0, $name)) {
-          if (is_array($rendered) && isset($rendered['rendered']) && !($rendered['rendered'] instanceof Markup)) {
-            $rendered = isset($rendered['rendered']['#build']) ? $rendered['rendered']['#build'] : [];
+            if (!empty($options['field']) && isset($options['settings']['media_switch']) && strpos($options['type'], 'blazy') !== FALSE) {
+              $name = $options['field'];
+            }
+          }
+
+          if (isset($name) && $rendered = $this->getFieldRenderable($row, 0, $name)) {
+            if (is_array($rendered) && isset($rendered['rendered']) && !($rendered['rendered'] instanceof Markup)) {
+              $rendered = isset($rendered['rendered']['#build']) ? $rendered['rendered']['#build'] : [];
+            }
           }
         }
       }
