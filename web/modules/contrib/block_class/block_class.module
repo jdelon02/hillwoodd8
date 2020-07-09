@@ -37,6 +37,7 @@ function block_class_form_block_form_alter(&$form, FormStateInterface $form_stat
       '#title' => t('CSS class(es)'),
       '#description' => t('Customize the styling of this block by adding CSS classes. Separate multiple classes by spaces.'),
       '#default_value' => $block->getThirdPartySetting('block_class', 'classes'),
+      '#maxlength' => 255,
     ];
 
   }
