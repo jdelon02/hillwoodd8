@@ -183,7 +183,7 @@ class Select2 extends Select {
       'handler' => $element['#selection_handler'],
     ];
     $value = is_array($element['#value']) ? $element['#value'] : [$element['#value']];
-    return static::getValidReferenceableEntities($value, $handler_settings);
+    return $value ? static::getValidReferenceableEntities($value, $handler_settings) : [];
   }
 
   /**
@@ -268,7 +268,7 @@ class Select2 extends Select {
       $element['#attributes']['data-select2-config'] += [
         'minimumInputLength' => 1,
         'ajax' => [
-          'delay' => 10,
+          'delay' => 250,
           'url' => $url->getGeneratedUrl(),
         ],
       ];
