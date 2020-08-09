@@ -144,7 +144,9 @@ class WebformTwigExtension extends \Twig_Extension {
 
     $variables = array_merge($variables, [
       '{{ data.element_key }}',
+      '{{ data[\'element_key\'] }}',
       '{{ data.element_key.delta }}',
+      '{{ data[\'element_key\'][\'delta\'] }}',
       '{{ data.composite_element_key.subelement_key }}',
       '{{ data.composite_element_key.delta.subelement_key }}',
       '{{ original_data }}',
@@ -226,7 +228,7 @@ class WebformTwigExtension extends \Twig_Extension {
    */
   public static function renderTwigTemplate(WebformSubmissionInterface $webform_submission, $template, array $options = [], array $context = []) {
     try {
-      $build = self::buildTwigTemplate($webform_submission, $template, $options, $context);
+      $build = static::buildTwigTemplate($webform_submission, $template, $options, $context);
       return \Drupal::service('renderer')->renderPlain($build);
     }
     catch (\Exception $exception) {
