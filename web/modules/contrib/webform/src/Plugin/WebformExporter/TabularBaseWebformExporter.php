@@ -46,7 +46,7 @@ abstract class TabularBaseWebformExporter extends WebformExporterBase {
       // Build a webform element for each field definition so that we can
       // use WebformElement::buildExportHeader(array $element, $export_options).
       $element = [
-        '#type' => ($field_definition['type'] == 'entity_reference') ? 'entity_autocomplete' : 'element',
+        '#type' => ($field_definition['type'] === 'entity_reference') ? 'entity_autocomplete' : 'element',
         '#admin_title' => '',
         '#title' => (string) $field_definition['title'],
         '#webform_key' => (string) $field_definition['name'],
@@ -142,7 +142,7 @@ abstract class TabularBaseWebformExporter extends WebformExporterBase {
         $entity_id = $webform_submission->entity_id->value;
         $entity = $this->entityTypeManager->getStorage($entity_type)->load($entity_id);
         if ($entity) {
-          $record[] = ($field_type == 'entity_url' && $entity->hasLinkTemplate('canonical')) ? $entity->toUrl()->setOption('absolute', TRUE)->toString() : $entity->label();
+          $record[] = ($field_type === 'entity_url' && $entity->hasLinkTemplate('canonical')) ? $entity->toUrl()->setOption('absolute', TRUE)->toString() : $entity->label();
         }
         else {
           $record[] = '';
@@ -183,12 +183,12 @@ abstract class TabularBaseWebformExporter extends WebformExporterBase {
     if (isset($this->fieldDefinitions['entity_type']) && isset($this->fieldDefinitions['entity_id'])) {
       $this->fieldDefinitions['entity_title'] = [
         'name' => 'entity_title',
-        'title' => t('Submitted to: Entity title'),
+        'title' => $this->t('Submitted to: Entity title'),
         'type' => 'entity_title',
       ];
       $this->fieldDefinitions['entity_url'] = [
         'name' => 'entity_url',
-        'title' => t('Submitted to: Entity URL'),
+        'title' => $this->t('Submitted to: Entity URL'),
         'type' => 'entity_url',
       ];
     }
