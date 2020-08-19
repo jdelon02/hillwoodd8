@@ -71,12 +71,17 @@ trait WebformEntityTrait {
 
     // If the selection handler is not using views, then translate
     // the entity reference's options.
-    if ($element['#selection_handler'] != 'views') {
-      $options = self::translateOptions($options, $element);
+    if ($element['#selection_handler'] !== 'views') {
+      $options = static::translateOptions($options, $element);
     }
 
-    // Only select menu can support optgroups.
-    if ($element['#type'] !== 'webform_entity_select') {
+    if ($element['#type'] === 'webform_entity_select') {
+      // Strip tags from options since <option> element does
+      // not support HTML tags.
+      $options = WebformOptionsHelper::stripTagsOptions($options);
+    }
+    else {
+      // Only select menu can support optgroups.
       $options = OptGroup::flattenOptions($options);
     }
 
@@ -103,7 +108,7 @@ trait WebformEntityTrait {
 
     foreach ($options as $key => $value) {
       if (is_array($value)) {
-        $options[$key] = self::translateOptions($value, $element);
+        $options[$key] = static::translateOptions($value, $element);
       }
       else {
         // Set the entity in the correct language for display.
