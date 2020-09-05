@@ -20,7 +20,7 @@
   function blazyColorbox(i, box) {
     var $box = $(box);
     var media = $box.data('media') || {};
-    var isMedia = media.type !== 'image' ? true : false;
+    var isMedia = media.type === 'video';
     var runtimeOptions = {
       rel: media.rel || null,
       iframe: isMedia,
@@ -95,6 +95,10 @@
    */
   Drupal.behaviors.blazyColorbox = {
     attach: function (context) {
+      if (typeof drupalSettings.colorbox === 'undefined') {
+        return;
+      }
+
       if (drupalSettings.colorbox.mobiledetect && window.matchMedia) {
         // Disable Colorbox for small screens.
         var mq = window.matchMedia('(max-device-width: ' + drupalSettings.colorbox.mobiledevicewidth + ')');
