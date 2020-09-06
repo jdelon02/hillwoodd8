@@ -63,7 +63,7 @@ class WebformLikert extends FormElement {
         $answer_description = '';
       }
       else {
-        $answer_description_property_name = ($element['#answers_description_display'] == 'help') ? 'help' : 'description';
+        $answer_description_property_name = ($element['#answers_description_display'] === 'help') ? 'help' : 'description';
         list($answer_title, $answer_description) = explode(WebformOptionsHelper::DESCRIPTION_DELIMITER, $answer);
       }
       $answers[$answer_key] = [
@@ -121,7 +121,7 @@ class WebformLikert extends FormElement {
         $question_description = '';
       }
       else {
-        $question_description_property_name = ($element['#questions_description_display'] == 'help') ? '#help' : '#description';
+        $question_description_property_name = ($element['#questions_description_display'] === 'help') ? '#help' : '#description';
         list($question_title, $question_description) = explode(WebformOptionsHelper::DESCRIPTION_DELIMITER, $question);
       }
 
@@ -260,7 +260,7 @@ class WebformLikert extends FormElement {
   /**
    * Performs the after_build callback.
    */
-  static public function afterBuild(array $element, FormStateInterface $form_state) {
+  public static function afterBuild(array $element, FormStateInterface $form_state) {
     if ($form_state->isProcessingInput()) {
       // Likert elements contain a table which uses 'item' form elements to
       // display the questions. These 'item' elements provide undesired data to
@@ -275,14 +275,17 @@ class WebformLikert extends FormElement {
   /**
    * {@inheritdoc}
    */
-  static public function valueCallback(&$element, $input, FormStateInterface $form_state) {
+  public static function valueCallback(&$element, $input, FormStateInterface $form_state) {
     $default_value = [];
     foreach ($element['#questions'] as $question_key => $question_title) {
       $default_value[$question_key] = NULL;
     }
 
     if ($input === FALSE) {
-      $element += ['#default_value' => []];
+      // FormBuilder can provide a default #default_value of an empty string.
+      if (empty($element['#default_value'])) {
+        $element['#default_value'] = [];
+      }
       return $element['#default_value'] + $default_value;
     }
     $value = $default_value;
