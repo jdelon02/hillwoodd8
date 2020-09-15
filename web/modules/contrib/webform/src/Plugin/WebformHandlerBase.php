@@ -76,6 +76,13 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
   protected $conditions = [];
 
   /**
+   * The webform handler's conditions result cache.
+   *
+   * @var array
+   */
+  protected $conditionsResultCache = [];
+
+  /**
    * The configuration factory.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface
@@ -90,7 +97,7 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
   protected $loggerFactory;
 
   /**
-   * Webform submission storage.
+   * The webform submission storage.
    *
    * @var \Drupal\webform\WebformSubmissionStorageInterface
    */
@@ -293,6 +300,7 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
    */
   public function setConditions(array $conditions) {
     $this->conditions = $conditions;
+    $this->conditionsResultCache = [];
     return $this;
   }
 
@@ -357,15 +365,22 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
   /**
    * {@inheritdoc}
    */
+  public function isApplicable(WebformInterface $webform) {
+    return TRUE;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function isSubmissionOptional() {
-    return ($this->pluginDefinition['submission'] === self::SUBMISSION_OPTIONAL);
+    return ($this->pluginDefinition['submission'] === WebformHandlerInterface::SUBMISSION_OPTIONAL);
   }
 
   /**
    * {@inheritdoc}
    */
   public function isSubmissionRequired() {
-    return ($this->pluginDefinition['submission'] === self::SUBMISSION_REQUIRED);
+    return ($this->pluginDefinition['submission'] === WebformHandlerInterface::SUBMISSION_REQUIRED);
   }
 
   /**
@@ -379,8 +394,14 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
    * {@inheritdoc}
    */
   public function checkConditions(WebformSubmissionInterface $webform_submission) {
+    $hash = $webform_submission->getDataHash();
+    if (isset($this->conditionsResultCache[$hash])) {
+      return $this->conditionsResultCache[$hash];
+    }
+
     // Return TRUE if conditions are disabled for the handler.
     if (!$this->supportsConditions()) {
+      $this->conditionsResultCache[$hash] = TRUE;
       return TRUE;
     }
 
@@ -388,6 +409,7 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
 
     // Return TRUE if no conditions are defined.
     if (empty($conditions)) {
+      $this->conditionsResultCache[$hash] = TRUE;
       return TRUE;
     }
 
@@ -402,7 +424,9 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
     $result = $this->conditionsValidator->validateConditions($conditions, $webform_submission);
 
     // Negate result for 'disabled' state.
-    return ($state === 'disabled') ? !$result : $result;
+    $result = ($state === 'disabled') ? !$result : $result;
+    $this->conditionsResultCache[$hash] = $result;
+    return $result;
   }
 
   /**
@@ -451,13 +475,6 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
   /**
    * {@inheritdoc}
    */
-  public function calculateDependencies() {
-    return [];
-  }
-
-  /**
-   * {@inheritdoc}
-   */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     return $form;
   }
@@ -483,10 +500,14 @@ abstract class WebformHandlerBase extends PluginBase implements WebformHandlerIn
    */
   protected function applyFormStateToConfiguration(FormStateInterface $form_state) {
     $values = $form_state->getValues();
+    $default_configuration = $this->defaultConfiguration();
     foreach ($values as $key => $value) {
       if (array_key_exists($key, $this->configuration)) {
-        if (is_bool($this->configuration[$key])) {
-          $this->configuration[$key] = (int) $value;
+        if (is_bool($default_configuration[$key])) {
+          $this->configuration[$key] = (boolean) $value;
+        }
+        elseif (is_int($default_configuration[$key])) {
+          $this->configuration[$key] = (integer) $value;
         }
         else {
           $this->configuration[$key] = $value;
