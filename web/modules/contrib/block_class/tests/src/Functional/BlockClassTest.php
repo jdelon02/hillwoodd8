@@ -19,6 +19,11 @@ class BlockClassTest extends BrowserTestBase {
   public static $modules = ['block', 'block_class'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * Tests the custom CSS classes for blocks.
    */
   public function testBlockClass() {
