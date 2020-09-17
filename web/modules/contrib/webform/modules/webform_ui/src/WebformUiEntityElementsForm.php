@@ -14,6 +14,8 @@ use Drupal\Core\Render\RendererInterface;
 use Drupal\Core\Url;
 use Drupal\webform\Element\WebformElementStates;
 use Drupal\webform\Form\WebformEntityAjaxFormTrait;
+use Drupal\webform\Plugin\WebformElement\WebformElement;
+use Drupal\webform\Plugin\WebformElement\WebformTable;
 use Drupal\webform\Utility\WebformDialogHelper;
 use Drupal\webform\Plugin\WebformElementManagerInterface;
 use Drupal\webform\WebformEntityElementsValidatorInterface;
@@ -46,21 +48,21 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
   protected $renderer;
 
   /**
-   * Element info manager.
+   * The element info manager.
    *
    * @var \Drupal\Core\Render\ElementInfoManagerInterface
    */
   protected $elementInfo;
 
   /**
-   * Webform element manager.
+   * The webform element manager.
    *
    * @var \Drupal\webform\Plugin\WebformElementManagerInterface
    */
   protected $elementManager;
 
   /**
-   * Webform element validator.
+   * The webform element validator.
    *
    * @var \Drupal\webform\WebformEntityElementsValidatorInterface
    */
@@ -376,7 +378,7 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
     if ($webform->hasContainer()) {
       $header['add'] = [
         'data' => '',
-        'class' => [RESPONSIVE_PRIORITY_MEDIUM, 'webform-ui-element-operations'],
+        'class' => ['webform-ui-element-operations'],
       ];
     }
     $header['key'] = [
@@ -463,6 +465,7 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
     $key = $element['#webform_key'];
     $title = $element['#admin_title'] ?: $element['#title'];
     $title = (is_array($title)) ? $this->renderer->render($title) : $title;
+
     $plugin_id = $this->elementManager->getElementPluginId($element);
 
     /** @var \Drupal\webform\Plugin\WebformElementInterface $webform_element */
@@ -471,7 +474,7 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
     $is_container = $webform_element->isContainer($element);
     $is_root = $webform_element->isRoot();
     $is_element_disabled = $webform_element->isDisabled();
-    $is_access_disabled = (isset($element['#access']) && $element['#access'] === FALSE);
+    $is_access_disabled = !Element::isVisibleElement($element);
 
     // If disabled, display warning.
     if ($is_element_disabled) {
@@ -500,8 +503,9 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
       $row_class[] = 'webform-ui-element-disabled';
     }
 
-    // Add element key.
+    // Add element key and type.
     $row['#attributes']['data-webform-key'] = $element['#webform_key'];
+    $row['#attributes']['data-webform-type'] = (isset($element['#type'])) ? $element['#type'] : '';
 
     $row['#attributes']['class'] = $row_class;
 
@@ -514,15 +518,25 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
     }
 
     $row['title'] = [
-      '#type' => 'link',
-      '#title' => $element['#admin_title'] ?: $element['#title'],
-      '#url' => new Url('entity.webform_ui.element.edit_form', [
-        'webform' => $webform->id(),
-        'key' => $key,
-      ]),
-      '#attributes' => $element_dialog_attributes,
-      '#prefix' => !empty($indentation) ? $this->renderer->renderPlain($indentation) : '',
+      'link' => [
+        '#type' => 'link',
+        '#title' => $element['#admin_title'] ?: $element['#title'],
+        '#url' => new Url('entity.webform_ui.element.edit_form', [
+          'webform' => $webform->id(),
+          'key' => $key,
+        ]),
+        '#attributes' => $element_dialog_attributes,
+        '#prefix' => !empty($indentation) ? $this->renderer->renderPlain($indentation) : '',
+      ],
     ];
+    if (!empty($element['#admin_notes'])) {
+      $row['title']['notes'] = [
+        '#type' => 'webform_help',
+        '#help_title' => $element['#admin_title'] ?: $element['#title'],
+        '#help' => $element['#admin_notes'],
+        '#weight' => 100,
+      ];
+    }
 
     if ($webform->hasContainer()) {
       if ($is_container) {
@@ -530,12 +544,23 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
           'webform' => $webform->id(),
         ];
         $route_options = ['query' => ['parent' => $key]];
-        $row['add'] = [
-          '#type' => 'link',
-          '#title' => $this->t('Add element'),
-          '#url' => new Url('entity.webform_ui.element', $route_parameters, $route_options),
-          '#attributes' => WebformDialogHelper::getModalDialogAttributes(WebformDialogHelper::DIALOG_NORMAL, ['button', 'button-action', 'button--primary', 'button--small']),
-        ];
+        if ($webform_element instanceof WebformTable) {
+          $route_parameters['type'] = 'webform_table_row';
+          $row['add'] = [
+            '#type' => 'link',
+            '#title' => $this->t('Add <span>row</span>'),
+            '#url' => new Url('entity.webform_ui.element.add_form', $route_parameters, $route_options),
+            '#attributes' => WebformDialogHelper::getOffCanvasDialogAttributes(WebformDialogHelper::DIALOG_NORMAL, ['button', 'button-action', 'button--primary', 'button--small']),
+          ];
+        }
+        else {
+          $row['add'] = [
+            '#type' => 'link',
+            '#title' => $this->t('Add <span>element</span>'),
+            '#url' => new Url('entity.webform_ui.element', $route_parameters, $route_options),
+            '#attributes' => WebformDialogHelper::getModalDialogAttributes(WebformDialogHelper::DIALOG_NORMAL, ['button', 'button-action', 'button--primary', 'button--small']),
+          ];
+        }
       }
       else {
         $row['add'] = ['#markup' => ''];
@@ -545,9 +570,16 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
       '#markup' => $element['#webform_key'],
     ];
 
-    $row['type'] = [
-      '#markup' => $webform_element->getPluginLabel(),
-    ];
+    $type = $webform_element->getPluginLabel();
+    if ($webform_element instanceof WebformElement) {
+      if (!empty($element['#type'])) {
+        $type = '[' . $element['#type'] . ']';
+      }
+      elseif (isset($element['#theme'])) {
+        $type = '[' . $element['#theme'] . ']';
+      }
+    }
+    $row['type'] = ['#markup' => $type];
 
     if ($webform->hasFlexboxLayout()) {
       $row['flex'] = [
@@ -663,7 +695,7 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
     // modal, then clicking the image button opens another modal,
     // which closes the original modal.
     // @todo Remove the below workaround once this issue is resolved.
-    if ($webform_element->getPluginId() == 'processed_text' && !WebformDialogHelper::useOffCanvas()) {
+    if ($webform_element->getPluginId() === 'processed_text' && !WebformDialogHelper::useOffCanvas()) {
       unset($row['operations']['#links']['edit']['attributes']);
     }
     if (!$is_container) {
@@ -727,16 +759,21 @@ class WebformUiEntityElementsForm extends BundleEntityFormBase {
     $row['required'] = ['#markup' => ''];
     $row['weight'] = ['#markup' => '', '#wrapper_attributes' => ['class' => ['webform-tabledrag-hide']]];
     $row['parent'] = ['#markup' => '', '#wrapper_attributes' => ['class' => ['webform-tabledrag-hide']]];
-    $row['operations'] = [
-      '#type' => 'operations',
-      '#prefix' => '<div class="webform-dropbutton">',
-      '#suffix' => '</div>',
-    ];
-    $row['operations']['#links']['customize'] = [
-      'title' => $this->t('Customize'),
-      'url' => new Url('entity.webform_ui.element.add_form', ['webform' => $webform->id(), 'type' => 'webform_actions']),
-      'attributes' => WebformDialogHelper::getOffCanvasDialogAttributes(),
-    ];
+    if ($this->elementManager->isExcluded('webform_actions')) {
+      $row['operations'] = ['#markup' => ''];
+    }
+    else {
+      $row['operations'] = [
+        '#type' => 'operations',
+        '#prefix' => '<div class="webform-dropbutton">',
+        '#suffix' => '</div>',
+      ];
+      $row['operations']['#links']['customize'] = [
+        'title' => $this->t('Customize'),
+        'url' => new Url('entity.webform_ui.element.add_form', ['webform' => $webform->id(), 'type' => 'webform_actions']),
+        'attributes' => WebformDialogHelper::getOffCanvasDialogAttributes(),
+      ];
+    }
     return $row;
   }
 
