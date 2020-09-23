@@ -111,6 +111,7 @@ class Select2 extends Select {
     $info['#selection_settings'] = [];
     $info['#autocomplete'] = FALSE;
     $info['#autocreate'] = [];
+    $info['#empty_value'] = '';
     $info['#cardinality'] = 0;
     $info['#pre_render'][] = [$class, 'preRenderAutocomplete'];
     $info['#pre_render'][] = [$class, 'preRenderOverwrites'];
@@ -152,8 +153,8 @@ class Select2 extends Select {
       }
     }
 
-    if (!$element['#multiple'] && !isset($element['#options'][''])) {
-      $empty_option = ['' => ''];
+    if (!$element['#multiple'] && !isset($element['#options'][$element['#empty_value']])) {
+      $empty_option = [$element['#empty_value'] => ''];
       $element['#options'] = $empty_option + $element['#options'];
     }
 
@@ -183,7 +184,7 @@ class Select2 extends Select {
       'handler' => $element['#selection_handler'],
     ];
     $value = is_array($element['#value']) ? $element['#value'] : [$element['#value']];
-    return static::getValidReferenceableEntities($value, $handler_settings);
+    return $value ? static::getValidReferenceableEntities($value, $handler_settings) : [];
   }
 
   /**
@@ -202,10 +203,25 @@ class Select2 extends Select {
     $current_language = \Drupal::languageManager()->getCurrentLanguage();
     $current_theme = \Drupal::theme()->getActiveTheme()->getName();
     $select2_theme_exists = \Drupal::service('library.discovery')->getLibraryByName($current_theme, 'select2.theme');
+
+    // Placeholder should be taken from #placeholder property if it set.
+    // Otherwise we can take it from '#empty_option' property.
+    $placeholder_text = $required ? new TranslatableMarkup('- Select -') : new TranslatableMarkup('- None -');
+    $placeholder = ['id' => '', 'text' => $placeholder_text];
+    if (!empty($element['#empty_value'])) {
+      $placeholder['id'] = $element['#empty_value'];
+    }
+    if (!empty($element['#placeholder'])) {
+      $placeholder['text'] = $element['#placeholder'];
+    }
+    elseif (!empty($element['#empty_option'])) {
+      $placeholder['text'] = $element['#empty_option'];
+    }
+
     // Defining the select2 configuration.
     $settings = [
       'multiple' => $multiple,
-      'placeholder' => $required ? new TranslatableMarkup('- Select -') : new TranslatableMarkup('- None -'),
+      'placeholder' => $placeholder,
       // @TODO: Enable allowClear for multiple fields. https://github.com/select2/select2/issues/3335.
       'allowClear' => !$multiple && !$required,
       'dir' => $current_language->getDirection(),
@@ -268,7 +284,7 @@ class Select2 extends Select {
       $element['#attributes']['data-select2-config'] += [
         'minimumInputLength' => 1,
         'ajax' => [
-          'delay' => 10,
+          'delay' => 250,
           'url' => $url->getGeneratedUrl(),
         ],
       ];
@@ -297,7 +313,7 @@ class Select2 extends Select {
    */
   public static function preRenderOverwrites($element) {
     if (!$element['#multiple']) {
-      $empty_option = ['' => ''];
+      $empty_option = [$element['#empty_value'] => ''];
       $element['#options'] = $empty_option + $element['#options'];
     }
 
