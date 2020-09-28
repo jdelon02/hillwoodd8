@@ -89,21 +89,21 @@ class WebformHelpManager implements WebformHelpManagerInterface {
   protected $pathMatcher;
 
   /**
-   * The Webform add-ons manager.
+   * The webform add-ons manager.
    *
    * @var \Drupal\webform\WebformAddonsManagerInterface
    */
   protected $addOnsManager;
 
   /**
-   * The Webform libraries manager.
+   * The webform libraries manager.
    *
    * @var \Drupal\webform\WebformLibrariesManagerInterface
    */
   protected $librariesManager;
 
   /**
-   * Webform element manager.
+   * The webform element manager.
    *
    * @var \Drupal\webform\Plugin\WebformElementManagerInterface
    */
@@ -977,6 +977,23 @@ class WebformHelpManager implements WebformHelpManagerInterface {
           ],
         ],
       ],
+      'variants' => [
+        'title' => $this->t('Webform variants'),
+        'content' => $this->t("This screencast provides an overview of how to use webform variants to create A/B tests, audience segmentation, and personalization."),
+        'youtube_id' => '53aB_mTkrI4',
+        'presentation_id' => '1Pd_F8t82iXnNn87fWCj5r2zLh9je-SrCmrpOQjG-xCc',
+        'links' => [
+
+          [
+            'title' => $this->t('Webform module now supports variants, which can be used for A/B tests, segmentation, and personalization'),
+            'url' => 'https://www.drupal.org/node/3104280',
+          ],
+          [
+            'title' => $this->t('Personalized Webforms'),
+            'url' => 'https://www.jrockowitz.com/blog/personalized-webforms',
+          ],
+        ],
+      ],
       'settings' => [
         'title' => $this->t('Configuring webform settings'),
         'content' => $this->t("This screencast shows how to configure a form's general settings, submission handling, confirmation message/page, custom CSS/JS and access controls."),
@@ -1257,6 +1274,40 @@ class WebformHelpManager implements WebformHelpManagerInterface {
           ],
         ],
       ],
+      'api_reuse' => [
+        'title' => $this->t('Reusing Webform APIs'),
+        'content' => $this->t('This screencast walks through how to reusing the Webform module’s APls to create custom configuration forms.'),
+        'youtube_id' => 't8cIZuAjYck',
+        'presentation_id' => '11IdSeA_UwT2nbE3jlDEYrESov_mEkL4ehu_Sf1j-eww',
+        'links' => [
+          [
+            'title' => $this->t('Form API | Drupal.org'),
+            'url' => 'https://www.drupal.org/project/devel',
+          ],
+          [
+            'title' => $this->t('Examples for Developers | Drupal.org'),
+            'url' => 'https://www.drupal.org/project/examples',
+          ],
+        ],
+      ],
+      'composites_vs_tables' => [
+        'title' => $this->t('Webform Composites vs. Tables'),
+        'content' => $this->t('This screencast walks through when to use a webform composite element and when to use a webform table.'),
+        'youtube_id' => '7cVIqySy5fs',
+        'presentation_id' => '1R13ZGkNgTkxjlN-BT05zrwW2JKhOcvGiByNYl7qtywg',
+      ],
+      'sharing' => [
+        'title' => $this->t('Sharing Webforms'),
+        'content' => $this->t('This screencast walks through how to share a webform with any website, webpage, or application.'),
+        'youtube_id' => 'oMgOprfJTWA',
+        'presentation_id' => '1ZYPW5BWh9gm7APrYKAuMdQKksFN2yWqaeN0C4iK127M',
+      ],
+      'cards' => [
+        'title' => $this->t('Webform Cards'),
+        'content' => $this->t('This screencast walks through how to create faster and better multistep form user experiences using the Webform Cards module.'),
+        'youtube_id' => 'bDugc2gWQnw',
+        'presentation_id' => '1N7gaq8jDyrGQUawBr8hvegQUfqESaBUEI3WYNpVfTKw',
+      ],
       'webform' => [
         'title' => $this->t('Webform: There is this for that'),
         'content' => $this->t('One of the key mantras in the Drupal is “there is a module for that, “ and Webform is the module for building forms for Drupal 8.'),
@@ -1313,6 +1364,12 @@ class WebformHelpManager implements WebformHelpManagerInterface {
         'youtube_id' => 'WQG6163r9Rs',
         'presentation_id' => '1Mn7qlSR_njTZcGAM3PNQZR8Tvg7qtPhZFQja7Mj5uzI',
       ],
+      'everyone' => [
+        'title' => $this->t('Webforms for Everyone'),
+        'content' => $this->t('This presentation explores how site owners, site builders, and developers can leverage the Webform module for Drupal 8 to build complex and robust forms for their end-users.'),
+        'youtube_id' => 'zvilAbrczGM',
+        'presentation_id' => '1APpt-55Ht_WLZc656KfQUXUoIAb-PTOmbMwSYSAw6G4',
+      ],
     ];
 
     // WebWash (www.webwash.net/).
@@ -1331,7 +1388,7 @@ class WebformHelpManager implements WebformHelpManagerInterface {
             'title' => $this->t('Moving Forward with Webform in Drupal 8: Part II | WebWash'),
             'url' => 'https://www.webwash.net/moving-forward-webform-drupal-8/ ',
           ],
-        ]
+        ],
       ],
       'webwash_install' => [
         'title' => $this->t('Using Webform in Drupal 8, 1.1: Install Webform'),
@@ -1584,7 +1641,6 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       ],
     ];
 
-
     /**************************************************************************/
     // Help.
     /**************************************************************************/
@@ -1661,6 +1717,19 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'routes' => [
         // @see /admin/structure/webform/config/handlers
         'webform.config.handlers',
+      ],
+    ];
+
+    // Configuration: Variants.
+    $help['config_variants'] = [
+      'group' => 'configuration',
+      'title' => $this->t('Configuration: Variants'),
+      'content' => $this->t('The <strong>Variants configuration</strong> page allows administrators to enable/disable variants.') . ' ' .
+        $this->t('<strong>Variants</strong> are used for A/B testing, segmentation, and personalization.'),
+      'video_id' => 'configuration',
+      'routes' => [
+        // @see /admin/structure/webform/config/variants
+        'webform.config.variants',
       ],
     ];
 
@@ -1785,6 +1854,18 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       ],
     ];
 
+    // Plugins: Variants.
+    $help['plugins_variants'] = [
+      'group' => 'plugins',
+      'title' => $this->t('Plugins: Variants'),
+      'content' => $this->t('The <strong>Variant plugins</strong> overview page lists all available webform variant plugins.') . ' ' .
+        $this->t('<strong>Variants</strong> are used for A/B testing, segmentation, and personalization.'),
+      'video_id' => 'plugins',
+      'routes' => [
+        // @see /admin/reports/webform-plugins/variants
+        'webform.reports_plugins.variants',
+      ],
+    ];
     // Plugins: Exporters.
     $help['plugins_exporters'] = [
       'group' => 'plugins',
@@ -1885,6 +1966,22 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'routes' => [
         // @see /admin/structure/webform/manage/{webform}/handlers
         'entity.webform.handlers',
+      ],
+    ];
+
+    /**************************************************************************/
+    // Variants.
+    /**************************************************************************/
+
+    // Variants.
+    $help['variants'] = [
+      'group' => 'variants',
+      'title' => $this->t('Variants'),
+      'content' => $this->t('The <strong>Variants</strong> page allows variations of a webform to be created and managed for A/B testing, segmentation, and personalization.'),
+      'video_id' => 'variants',
+      'routes' => [
+        // @see /admin/structure/webform/manage/{webform}/variants
+        'entity.webform.variants',
       ],
     ];
 
@@ -2013,9 +2110,9 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'content' => $this->t("The <strong>View</strong> page displays a submission's general information and data."),
       'video_id' => 'submission',
       'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submisssion}
+        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submission}
         'entity.webform_submission.canonical',
-        // @see /node/{node}/webform/submission/{webform_submisssion}
+        // @see /node/{node}/webform/submission/{webform_submission}
         'entity.node.webform_submission.canonical',
       ],
     ];
@@ -2026,9 +2123,9 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'content' => $this->t("The <strong>Table</strong> page displays a submission's general information and data using tabular layout."),
       'video_id' => 'submission',
       'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submisssion}/table
+        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submission}/table
         'entity.webform_submission.table',
-        // @see /node/{node}/webform/submission/{webform_submisssion}/table
+        // @see /node/{node}/webform/submission/{webform_submission}/table
         'entity.node.webform_submission.table',
       ],
     ];
@@ -2039,9 +2136,9 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'content' => $this->t("The <strong>Plain text</strong> page displays a submission's general information and data as plain text."),
       'video_id' => 'submission',
       'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submisssion}/text
+        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submission}/text
         'entity.webform_submission.text',
-        // @see /node/{node}/webform/submission/{webform_submisssion}/text
+        // @see /node/{node}/webform/submission/{webform_submission}/text
         'entity.node.webform_submission.text',
       ],
     ];
@@ -2052,9 +2149,9 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'content' => $this->t("The <strong>Data (YAML)</strong> page displays a submission's raw data as YAML."),
       'video_id' => 'submission',
       'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submisssion}/yaml
+        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submission}/yaml
         'entity.webform_submission.yaml',
-        // @see /node/{node}/webform/submission/{webform_submisssion}/yaml
+        // @see /node/{node}/webform/submission/{webform_submission}/yaml
         'entity.node.webform_submission.yaml',
       ],
     ];
@@ -2065,9 +2162,9 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'content' => $this->t("The <strong>Edit</strong> form allows the administrator to update a submission."),
       'video_id' => 'submission',
       'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submisssion}/edit
+        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submission}/edit
         'entity.webform_submission.edit_form',
-        // @see /node/{node}/webform/submission/{webform_submisssion}/edit
+        // @see /node/{node}/webform/submission/{webform_submission}/edit
         'entity.node.webform_submission.edit_form',
       ],
     ];
@@ -2078,9 +2175,9 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'content' => $this->t("The <strong>Edit all</strong> form allows administrator to update all values for submission create from a multi-step form."),
       'video_id' => 'submission',
       'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submisssion}/edit_all
+        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submission}/edit_all
         'entity.webform_submission.edit_all',
-        // @see /node/{node}/webform/submission/{webform_submisssion}/edit_all
+        // @see /node/{node}/webform/submission/{webform_submission}/edit_all
         'entity.node.webform_submission.edit_all',
       ],
     ];
@@ -2091,9 +2188,9 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'content' => $this->t("The <strong>Resend</strong> form allows administrator to preview and resend emails and messages."),
       'video_id' => 'submission',
       'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submisssion}/resend
+        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submission}/resend
         'entity.webform_submission.resend_form',
-        // @see /node/{node}/webform/submission/{webform_submisssion}/resend
+        // @see /node/{node}/webform/submission/{webform_submission}/resend
         'entity.node.webform_submission.resend_form',
       ],
     ];
@@ -2103,23 +2200,27 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       'title' => $this->t('Submission: Notes'),
       'content' => $this->t("The <strong>Notes</strong> form allows administrator to flag and annotate a submission."),
       'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submisssion}/notes
+        // @see /admin/structure/webform/manage/{webform}/submission/{webform_submission}/notes
         'entity.webform_submission.notes_form',
-        // @see /node/{node}/webform/submission/{webform_submisssion}/notes
+        // @see /node/{node}/webform/submission/{webform_submission}/notes
         'entity.node.webform_submission.notes_form',
       ],
     ];
 
     /**************************************************************************/
-    // Devel.
+    // Export.
     /**************************************************************************/
 
-    // Devel: Export.
-    $help['devel_export'] = [
+    // Export: Config.
+    $config_import_href = ($this->moduleHandler->moduleExists('config') && $this->currentUser->hasPermission('import configuration'))
+      ? Url::fromRoute('config.import_single', [], ['query' => ['config_type' => 'webform']])->toString()
+      : 'https://www.drupal.org/docs/8/configuration-management';
+    $help['webform_config_export'] = [
       'group' => 'development',
       'title' => $this->t('Devel: Export'),
-      'content' => $this->t("The <strong>Export</strong> form allows developers to quickly export a single webform's YAML configuration file.") . ' ' .
-        $this->t('If you run into any issues with a webform, you can also attach the below configuration (without any personal information) to a new ticket in the Webform module\'s <a href=":href">issue queue</a>.', [':href' => 'https://www.drupal.org/project/issues/webform']),
+      'content' => $this->t("The <strong>Config Export</strong> form allows developers to quickly export a single webform's YAML configuration file.")
+        . ' ' . $this->t('A single webform\'s YAML configuration file can easily be <a href=":href">imported</a> into another Drupal instance.', [':href' => $config_import_href])
+        . ' ' . $this->t('If you run into any issues with a webform, you can also attach the below configuration (without any personal information) to a new ticket in the Webform module\'s <a href=":href">issue queue</a>.', [':href' => 'https://www.drupal.org/project/issues/webform']),
       'video_id' => 'development',
       'routes' => [
         // @see /admin/structure/webform/manage/{webform}/export
@@ -2127,22 +2228,9 @@ class WebformHelpManager implements WebformHelpManagerInterface {
       ],
     ];
 
-    // Devel: Schema.
-    $help['devel_schema'] = [
-      'group' => 'development',
-      'title' => $this->t('Devel: Webform Schema'),
-      'content' => $this->t("The <strong>Schema</strong> page displays an overview of a webform's elements and specified data types, which can be used to map webform submissions to an external API."),
-      'video_id' => 'development',
-      'routes' => [
-        // @see /admin/structure/webform/manage/{webform}/schema
-        'entity.webform.schema_form',
-      ],
-    ];
-
     /**************************************************************************/
     // Modules.
     /**************************************************************************/
-
 
     // Webform Entity Print (PDF).
     $help['webform_entity_print'] = [
