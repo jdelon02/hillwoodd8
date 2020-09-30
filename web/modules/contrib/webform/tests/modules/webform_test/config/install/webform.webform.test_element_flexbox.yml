@@ -1,3 +1,4 @@
+uuid: null
 langcode: en
 status: open
 dependencies:
@@ -555,20 +556,6 @@ elements: |
     flex_webform_location_places_right:
       '#type': webform_location_places
       '#title': 'Location (Algolia Places) 02'
-  flexbox_webform_location_geocomplete:
-    '#type': webform_flexbox
-    flex_webform_location_geocomplete_left:
-      '#type': webform_location_geocomplete
-      '#title': 'Location (Geocomplete) 01'
-      '#map': true
-      '#geolocation': true
-      '#format': map
-    flex_webform_location_geocomplete_right:
-      '#type': webform_location_geocomplete
-      '#title': 'Location (Geocomplete) 02'
-      '#map': true
-      '#geolocation': true
-      '#format': map
   flexbox_machine_name:
     '#type': webform_flexbox
     flex_machine_name_left:
@@ -909,30 +896,6 @@ elements: |
       '#type': webform_time
       '#title': 'Time 02'
       '#description': '<b>Known Issues:</b><br /><a href="https://www.drupal.org/node/1838234">Issue #1838234: Add jQuery Timepicker for the Time element of the datetime field</a>'
-  flexbox_webform_toggle:
-    '#type': webform_flexbox
-    flex_webform_toggle_left:
-      '#type': webform_toggle
-      '#title': 'Toggle 01'
-    flex_webform_toggle_right:
-      '#type': webform_toggle
-      '#title': 'Toggle 02'
-  flexbox_webform_toggles:
-    '#type': webform_flexbox
-    flex_webform_toggles_left:
-      '#type': webform_toggles
-      '#title': 'Toggles 01'
-      '#options':
-        one: One
-        two: Two
-        three: Three
-    flex_webform_toggles_right:
-      '#type': webform_toggles
-      '#title': 'Toggles 02'
-      '#options':
-        one: One
-        two: Two
-        three: Three
   flexbox_url:
     '#type': webform_flexbox
     flex_url_left:
@@ -986,7 +949,7 @@ settings:
   page: true
   page_submit_path: ''
   page_confirm_path: ''
-  page_admin_theme: false
+  page_theme_name: ''
   form_title: source_entity_webform
   form_submit_once: false
   form_exception_message: ''
@@ -1016,6 +979,12 @@ settings:
   form_access_denied_message: ''
   form_access_denied_attributes: {  }
   form_file_limit: ''
+  form_elements_attributes: {  }
+  share: false
+  share_node: false
+  share_theme_name: ''
+  share_title: true
+  share_page_body_attributes: {  }
   submission_label: ''
   submission_log: false
   submission_views: {  }
@@ -1041,11 +1010,19 @@ settings:
   wizard_progress_percentage: false
   wizard_progress_link: false
   wizard_progress_states: false
+  wizard_auto_forward: true
+  wizard_auto_forward_hide_next_button: false
+  wizard_keyboard: true
   wizard_start_label: ''
   wizard_preview_link: false
   wizard_confirmation: true
   wizard_confirmation_label: ''
   wizard_track: ''
+  wizard_prev_button_label: ''
+  wizard_next_button_label: ''
+  wizard_toggle: false
+  wizard_toggle_show_label: ''
+  wizard_toggle_hide_label: ''
   preview: 0
   preview_label: ''
   preview_title: ''
@@ -1088,8 +1065,10 @@ settings:
   purge_days: null
   results_disabled: false
   results_disabled_ignore: false
+  results_customize: false
   token_view: false
   token_update: false
+  serial_disabled: false
 access:
   create:
     roles:
@@ -1138,3 +1117,4 @@ access:
     users: {  }
     permissions: {  }
 handlers: {  }
+variants: {  }

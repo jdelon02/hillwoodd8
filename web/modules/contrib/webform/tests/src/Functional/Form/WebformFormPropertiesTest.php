@@ -7,7 +7,7 @@ use Drupal\Tests\webform\Functional\WebformBrowserTestBase;
 /**
  * Tests for form properties.
  *
- * @group Webform
+ * @group webform
  */
 class WebformFormPropertiesTest extends WebformBrowserTestBase {
 
@@ -42,16 +42,20 @@ class WebformFormPropertiesTest extends WebformBrowserTestBase {
       'attributes[class][other]' => 'test-form-properties',
       'attributes[style]' => 'border: 10px solid green; padding: 1em;',
       'attributes[attributes]' => '',
+      'form_elements_attributes[class][select][]' => ['_other_'],
+      'form_elements_attributes[class][other]' => 'test-form-element-properties',
+      'form_elements_attributes[style]' => 'border: 10px solid red; padding: 1em;',
       'method' => '',
       'action' => '',
       'custom' => "'suffix': 'Form suffix TEST'
 'prefix': 'Form prefix TEST'",
     ];
-    $this->drupalPostForm('/admin/structure/webform/manage/test_form_properties/settings/form', $edit, t('Save'));
+    $this->drupalPostForm('/admin/structure/webform/manage/test_form_properties/settings/form', $edit, 'Save');
     $this->drupalGet('/webform/test_form_properties');
     $this->assertPattern('/Form prefix TEST<form /');
     $this->assertPattern('/<\/form>\s+Form suffix TEST/');
     $this->assertRaw('<form class="webform-submission-form webform-submission-add-form webform-submission-test-form-properties-form webform-submission-test-form-properties-add-form form--inline clearfix test-form-properties js-webform-details-toggle webform-details-toggle" style="border: 10px solid green; padding: 1em;" data-drupal-selector="webform-submission-test-form-properties-add-form" action="' . $base_path . 'webform/test_form_properties" method="post" id="webform-submission-test-form-properties-add-form" accept-charset="UTF-8">');
+    $this->assertRaw('<div class="test-form-element-properties webform-elements" style="border: 10px solid red; padding: 1em;" data-drupal-selector="edit-elements">');
   }
 
 }
