@@ -2,7 +2,7 @@
 
 namespace Drupal\webform\Plugin;
 
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
@@ -20,7 +20,7 @@ use Drupal\webform\WebformSubmissionInterface;
  * @see \Drupal\webform\Plugin\WebformHandlerManagerInterface
  * @see plugin_api
  */
-interface WebformHandlerInterface extends PluginInspectionInterface, ConfigurablePluginInterface, ContainerFactoryPluginInterface, PluginFormInterface {
+interface WebformHandlerInterface extends PluginInspectionInterface, ConfigurableInterface, ContainerFactoryPluginInterface, PluginFormInterface {
 
   /**
    * Value indicating unlimited plugin instances are permitted.
@@ -229,6 +229,17 @@ interface WebformHandlerInterface extends PluginInspectionInterface, Configurabl
   public function isDisabled();
 
   /**
+   * Determine if this handle is applicable to the webform.
+   *
+   * @param \Drupal\webform\WebformInterface $webform
+   *   A webform.
+   *
+   * @return bool
+   *   TRUE if this handler is applicable to the webform.
+   */
+  public function isApplicable(WebformInterface $webform);
+
+  /**
    * Returns the webform submission is optional indicator.
    *
    * @return bool
@@ -373,6 +384,19 @@ interface WebformHandlerInterface extends PluginInspectionInterface, Configurabl
   /****************************************************************************/
   // Submission form methods.
   /****************************************************************************/
+
+  /**
+   * Get configuration form's off-canvas width.
+   *
+   * @return string
+   *   The off-canvas width.
+   *
+   * @see WebformDialogHelper::DIALOG_NARROW
+   * @see WebformDialogHelper::DIALOG_NORMAL
+   * @see WebformDialogHelper::DIALOG_WIDE
+   * @see WebformDialogHelper::DIALOG_NONE
+   */
+  public function getOffCanvasWidth();
 
   /**
    * Alter webform submission webform .
