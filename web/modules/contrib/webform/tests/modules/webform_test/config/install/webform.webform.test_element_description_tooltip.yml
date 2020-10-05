@@ -1,3 +1,4 @@
+uuid: null
 langcode: en
 status: open
 dependencies:
@@ -133,11 +134,6 @@ elements: |
       '#international': true
       '#description': 'This is a description for the ''tel'' element.'
       '#description_display': tooltip
-    webform_toggle:
-      '#type': webform_toggle
-      '#title': Toggle
-      '#description': 'This is a description for the ''webform_toggle'' element.'
-      '#description_display': tooltip
     url:
       '#type': url
       '#title': URL
@@ -188,14 +184,6 @@ elements: |
       '#type': webform_location_places
       '#title': 'Location (Algolia Places)'
       '#description': 'This is a description for the ''webform_location_places'' element.'
-      '#description_display': tooltip
-    webform_location_geocomplete:
-      '#type': webform_location_geocomplete
-      '#title': 'Location (Geocomplete)'
-      '#map': true
-      '#geolocation': true
-      '#format': map
-      '#description': 'This is a description for the ''webform_location_geocomplete'' element.'
       '#description_display': tooltip
     webform_name:
       '#type': webform_name
@@ -345,15 +333,6 @@ elements: |
         three: Three
       '#description': 'This is a description for the ''webform_select_other'' element.'
       '#description_display': tooltip
-    webform_toggles:
-      '#type': webform_toggles
-      '#title': Toggles
-      '#options':
-        one: One
-        two: Two
-        three: Three
-      '#description': 'This is a description for the ''webform_toggles'' element.'
-      '#description_display': tooltip
   computed_elements:
     '#type': details
     '#title': 'Computed Elements'
@@ -500,7 +479,7 @@ settings:
   page: true
   page_submit_path: ''
   page_confirm_path: ''
-  page_admin_theme: false
+  page_theme_name: ''
   form_title: source_entity_webform
   form_submit_once: false
   form_exception_message: ''
@@ -530,6 +509,12 @@ settings:
   form_access_denied_message: ''
   form_access_denied_attributes: {  }
   form_file_limit: ''
+  form_elements_attributes: {  }
+  share: false
+  share_node: false
+  share_theme_name: ''
+  share_title: true
+  share_page_body_attributes: {  }
   submission_label: ''
   submission_log: false
   submission_views: {  }
@@ -555,11 +540,19 @@ settings:
   wizard_progress_percentage: false
   wizard_progress_link: false
   wizard_progress_states: false
+  wizard_auto_forward: true
+  wizard_auto_forward_hide_next_button: false
+  wizard_keyboard: true
   wizard_start_label: ''
   wizard_preview_link: false
   wizard_confirmation: true
   wizard_confirmation_label: ''
   wizard_track: ''
+  wizard_prev_button_label: ''
+  wizard_next_button_label: ''
+  wizard_toggle: false
+  wizard_toggle_show_label: ''
+  wizard_toggle_hide_label: ''
   preview: 0
   preview_label: ''
   preview_title: ''
@@ -602,8 +595,10 @@ settings:
   purge_days: null
   results_disabled: false
   results_disabled_ignore: false
+  results_customize: false
   token_view: false
   token_update: false
+  serial_disabled: false
 access:
   create:
     roles:
@@ -652,3 +647,4 @@ access:
     users: {  }
     permissions: {  }
 handlers: {  }
+variants: {  }
