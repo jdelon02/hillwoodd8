@@ -11,6 +11,9 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides a Condition delete form.
+ */
 class ConditionDeleteForm extends ConfirmFormBase {
 
   /**
@@ -37,7 +40,8 @@ class ConditionDeleteForm extends ConfirmFormBase {
   /**
    * Construct a condition delete form.
    *
-   * @param ContextManager $contextManager
+   * @param \Drupal\context\ContextManager $contextManager
+   *   The Context module context manager.
    */
   public function __construct(ContextManager $contextManager) {
     $this->contextManager = $contextManager;
@@ -47,7 +51,7 @@ class ConditionDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container) {
-    return new static (
+    return new static(
       $container->get('context.manager')
     );
   }
@@ -72,7 +76,7 @@ class ConditionDeleteForm extends ConfirmFormBase {
    * {@inheritdoc}
    */
   public function getCancelUrl() {
-    return $this->context->urlInfo('edit-form');
+    return $this->context->toUrl('edit-form');
   }
 
   /**
@@ -100,7 +104,7 @@ class ConditionDeleteForm extends ConfirmFormBase {
 
     // Submit the form with AJAX if possible.
     $form['actions']['submit']['#ajax'] = [
-      'callback' => '::submitFormAjax'
+      'callback' => '::submitFormAjax',
     ];
 
     return $form;
@@ -115,8 +119,9 @@ class ConditionDeleteForm extends ConfirmFormBase {
 
     // If this is not an AJAX request then redirect and show a message.
     if (!$this->getRequest()->isXmlHttpRequest()) {
-      drupal_set_message($this->t('The condition %name has been removed.', [
-          '%name' => $this->condition->getPluginDefinition()['label']]
+      $this->messenger()->addMessage($this->t('The condition %name has been removed.', [
+        '%name' => $this->condition->getPluginDefinition()['label'],
+      ]
       ));
 
       $form_state->setRedirectUrl($this->getCancelUrl());
@@ -126,7 +131,8 @@ class ConditionDeleteForm extends ConfirmFormBase {
   /**
    * Handle when the form is submitted trough AJAX.
    *
-   * @return AjaxResponse
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An AJAX response.
    */
   public function submitFormAjax() {
     $contextForm = $this->contextManager->getForm($this->context, 'edit');
