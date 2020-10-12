@@ -2,7 +2,6 @@ name: 'Select2 facets test'
 type: module
 description: 'Support module for select2 facets tests.'
 package: Testing
-# core: 8.x
 dependencies:
   - facets:facets
   - search_api:search_api_db
@@ -11,8 +10,7 @@ dependencies:
   - drupal:views
   - drupal:block
 
-# Information added by Drupal.org packaging script on 2019-08-08
-version: '8.x-1.4'
-core: '8.x'
+# Information added by Drupal.org packaging script on 2020-10-08
+version: '8.x-1.11'
 project: 'select2'
-datestamp: 1565263992
+datestamp: 1602165682
