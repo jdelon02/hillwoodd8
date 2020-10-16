@@ -647,7 +647,7 @@ class RevisionsTranslationsTest extends EntityUsageJavascriptTestBase {
     $this->assertEquals($expected, $usage);
     // Bye source node in main language.
     $this->drupalGet("/node/{$node3->id()}/delete");
-    $assert_session->pageTextContains('The following content translations will be deleted');
+    $assert_session->pageTextContains('The following content item translations will be deleted');
     $page->pressButton('Delete all translations');
     $session->wait(500);
     $this->saveHtmlOutput();
