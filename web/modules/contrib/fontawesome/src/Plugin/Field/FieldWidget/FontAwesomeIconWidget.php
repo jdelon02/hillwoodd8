@@ -28,7 +28,7 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
   /**
    * Drupal configuration service container.
    *
-   * @var Drupal\Core\Config\ConfigFactory
+   * @var \Drupal\Core\Config\ConfigFactory
    */
   protected $configFactory;
 
@@ -106,14 +106,17 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
       '#default_value' => $items[$delta]->get('style')->getValue(),
     ];
     // Remove style options if they aren't being loaded.
-    if (!$configuration_settings->get('use_solid_file')) {
+    if (is_bool($configuration_settings->get('use_solid_file')) && !$configuration_settings->get('use_solid_file')) {
       unset($element['settings']['style']['#options']['fas']);
     }
-    if (!$configuration_settings->get('use_regular_file')) {
+    if (is_bool($configuration_settings->get('use_regular_file')) && !$configuration_settings->get('use_regular_file')) {
       unset($element['settings']['style']['#options']['far']);
     }
-    if (!$configuration_settings->get('use_light_file')) {
+    if (is_bool($configuration_settings->get('use_light_file')) && !$configuration_settings->get('use_light_file')) {
       unset($element['settings']['style']['#options']['fal']);
+    }
+    if (is_bool($configuration_settings->get('use_duotone_file')) && !$configuration_settings->get('use_duotone_file')) {
+      unset($element['settings']['style']['#options']['fad']);
     }
 
     // Allow user to determine size.
@@ -188,6 +191,14 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
         'fa-pull-right' => $this->t('Right'),
       ],
       '#default_value' => isset($iconSettings['pull']) ? $iconSettings['pull'] : '',
+    ];
+
+    // Allow to use CSS Classes for any purpose eg background color.
+    $element['settings']['additional_classes'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Additional Classes'),
+      '#default_value' => isset($iconSettings['additional_classes']) ? $iconSettings['additional_classes'] : '',
+      '#description' => $this->t('Use space separated classes for additional manual icon tagging / settings.'),
     ];
 
     // Allow user to edit duotone.
