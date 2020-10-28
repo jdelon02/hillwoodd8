@@ -18,9 +18,9 @@ use Symfony\Component\HttpFoundation\Request;
 class WebformPluginHandlerController extends ControllerBase implements ContainerInjectionInterface {
 
   /**
-   * A webform handler plugin manager.
+   * The webform handler plugin manager.
    *
-   * @var \Drupal\Component\Plugin\PluginManagerInterface
+   * @var \Drupal\webform\Plugin\WebformHandlerManagerInterface
    */
   protected $pluginManager;
 
@@ -61,7 +61,7 @@ class WebformPluginHandlerController extends ControllerBase implements Container
           $definition['description'],
           $definition['category'],
           (isset($excluded_handlers[$plugin_id])) ? $this->t('Yes') : $this->t('No'),
-          ($definition['cardinality'] == -1) ? $this->t('Unlimited') : $definition['cardinality'],
+          ($definition['cardinality'] === -1) ? $this->t('Unlimited') : $definition['cardinality'],
           $definition['conditions'] ? $this->t('Yes') : $this->t('No'),
           $definition['submission'] ? $this->t('Required') : $this->t('Optional'),
           $definition['results'] ? $this->t('Processed') : $this->t('Ignored'),
@@ -139,7 +139,14 @@ class WebformPluginHandlerController extends ControllerBase implements Container
     $rows = [];
     foreach ($definitions as $plugin_id => $definition) {
       // Skip email handler which has dedicated button.
-      if ($plugin_id == 'email') {
+      if ($plugin_id === 'email') {
+        continue;
+      }
+      /** @var \Drupal\webform\Plugin\WebformHandlerInterface $handler_plugin */
+      $handler_plugin = $this->pluginManager->createInstance($plugin_id);
+
+      // Check if applicable.
+      if (!$handler_plugin->isApplicable($webform)) {
         continue;
       }
 
@@ -168,7 +175,7 @@ class WebformPluginHandlerController extends ControllerBase implements Container
           '#type' => 'link',
           '#title' => $definition['label'],
           '#url' => Url::fromRoute('entity.webform.handler.add_form', ['webform' => $webform->id(), 'webform_handler' => $plugin_id]),
-          '#attributes' => WebformDialogHelper::getOffCanvasDialogAttributes(),
+          '#attributes' => WebformDialogHelper::getOffCanvasDialogAttributes($handler_plugin->getOffCanvasWidth()),
           '#prefix' => '<div class="webform-form-filter-text-source">',
           '#suffix' => '</div>',
         ];
@@ -195,7 +202,7 @@ class WebformPluginHandlerController extends ControllerBase implements Container
         $links['add'] = [
           'title' => $this->t('Add handler'),
           'url' => Url::fromRoute('entity.webform.handler.add_form', ['webform' => $webform->id(), 'webform_handler' => $plugin_id]),
-          'attributes' => WebformDialogHelper::getOffCanvasDialogAttributes(),
+          'attributes' => WebformDialogHelper::getOffCanvasDialogAttributes($handler_plugin->getOffCanvasWidth()),
         ];
         $row['operations']['data'] = [
           '#type' => 'operations',
@@ -207,8 +214,6 @@ class WebformPluginHandlerController extends ControllerBase implements Container
 
       $rows[] = $row;
     }
-
-    $build['#attached']['library'][] = 'webform/webform.form';
 
     $build['filter'] = [
       '#type' => 'search',
@@ -236,6 +241,8 @@ class WebformPluginHandlerController extends ControllerBase implements Container
         'class' => ['webform-handler-add-table'],
       ],
     ];
+
+    $build['#attached']['library'][] = 'webform/webform.admin';
 
     return $build;
   }
