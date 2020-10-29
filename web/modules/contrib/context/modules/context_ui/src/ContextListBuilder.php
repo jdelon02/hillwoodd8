@@ -2,7 +2,6 @@
 
 namespace Drupal\context_ui;
 
-use Drupal\context\ContextInterface;
 use Drupal\context\ContextManager;
 use Drupal\context\Entity\Context;
 use Drupal\Component\Utility\Html;
@@ -13,8 +12,12 @@ use Drupal\Core\Form\FormBuilderInterface;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Config\Entity\ConfigEntityListBuilder;
+use Drupal\Core\Messenger\MessengerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides a class to crate the Context List.
+ */
 class ContextListBuilder extends ConfigEntityListBuilder implements FormInterface {
 
   use AjaxFormTrait;
@@ -22,40 +25,50 @@ class ContextListBuilder extends ConfigEntityListBuilder implements FormInterfac
   /**
    * The Context modules context manager.
    *
-   * @var ContextManager
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
   /**
-   * @var FormBuilderInterface
+   * The form builder.
+   *
+   * @var \Drupal\Core\Form\FormBuilderInterface
    */
   protected $formBuilder;
+
+  /**
+   * The messenger.
+   *
+   * @var \Drupal\Core\Messenger\MessengerInterface
+   */
+  protected $messenger;
 
   /**
    * Constructs a new ContextListBuilder object.
    *
    * @param \Drupal\Core\Entity\EntityTypeInterface $entity_type
    *   The entity type definition.
-   *
    * @param \Drupal\Core\Entity\EntityStorageInterface $storage
    *   The entity storage class.
-   *
    * @param \Drupal\context\ContextManager $contextManager
    *   The Context module context manager.
-   *
    * @param \Drupal\Core\Form\FormBuilderInterface $formBuilder
    *   The Drupal form builder.
+   * @param \Drupal\Core\Messenger\MessengerInterface $messenger
+   *   The messenger.
    */
   public function __construct(
     EntityTypeInterface $entity_type,
     EntityStorageInterface $storage,
     ContextManager $contextManager,
-    FormBuilderInterface $formBuilder
+    FormBuilderInterface $formBuilder,
+    MessengerInterface $messenger
   ) {
     parent::__construct($entity_type, $storage);
 
     $this->contextManager = $contextManager;
     $this->formBuilder = $formBuilder;
+    $this->messenger = $messenger;
   }
 
   /**
@@ -64,9 +77,10 @@ class ContextListBuilder extends ConfigEntityListBuilder implements FormInterfac
   public static function createInstance(ContainerInterface $container, EntityTypeInterface $entity_type) {
     return new static(
       $entity_type,
-      $container->get('entity.manager')->getStorage($entity_type->id()),
+      $container->get('entity_type.manager')->getStorage($entity_type->id()),
       $container->get('context.manager'),
-      $container->get('form_builder')
+      $container->get('form_builder'),
+      $container->get('messenger')
     );
   }
 
@@ -92,20 +106,20 @@ class ContextListBuilder extends ConfigEntityListBuilder implements FormInterfac
   public function buildForm(array $form, FormStateInterface $form_state) {
     $groups = $this->contextManager->getContextsByGroup();
 
-    $form['contexts'] = array(
+    $form['contexts'] = [
       '#type' => 'table',
-      '#header' => array(
+      '#header' => [
         $this->t('Context'),
         $this->t('Description'),
         $this->t('Group'),
         $this->t('Weight'),
         $this->t('Operations'),
-      ),
+      ],
       '#empty' => $this->t('There are no contexts defined.'),
-      '#attributes' => array(
+      '#attributes' => [
         'id' => 'contexts',
-      ),
-    );
+      ],
+    ];
 
     $group_options = [];
 
@@ -120,27 +134,27 @@ class ContextListBuilder extends ConfigEntityListBuilder implements FormInterfac
     foreach ($groups as $group => $contexts) {
       $group_class = Html::getClass($group);
 
-      $form['contexts']['#tabledrag'][] = array(
+      $form['contexts']['#tabledrag'][] = [
         'action' => 'match',
         'relationship' => 'sibling',
         'group' => 'context-group-select',
         'subgroup' => 'context-group-' . $group_class,
         'hidden' => FALSE,
-      );
+      ];
 
-      $form['contexts']['#tabledrag'][] = array(
+      $form['contexts']['#tabledrag'][] = [
         'action' => 'order',
         'relationship' => 'sibling',
         'group' => 'context-weight',
         'subgroup' => 'context-weight-' . $group_class,
-      );
+      ];
 
-      $form['contexts']['group-' . $group_class] = array(
-        '#attributes' => array(
-          'class' => array('group-label', 'group-label-' . $group_class),
+      $form['contexts']['group-' . $group_class] = [
+        '#attributes' => [
+          'class' => ['group-label', 'group-label-' . $group_class],
           'no_striping' => TRUE,
-        ),
-      );
+        ],
+      ];
 
       $form['contexts']['group-' . $group_class] = [
         '#attributes' => [
@@ -154,23 +168,23 @@ class ContextListBuilder extends ConfigEntityListBuilder implements FormInterfac
         ],
       ];
 
-      /** @var ContextInterface $context */
+      /** @var \Drupal\context\ContextInterface $context */
       foreach ($contexts as $context_id => $context) {
         $operations = [
           'edit' => [
             'title' => $this->t('Edit'),
-            'url' => $context->urlInfo('edit-form'),
+            'url' => $context->toUrl('edit-form'),
           ],
           'delete' => [
             'title' => $this->t('Delete'),
-            'url' => $context->urlInfo('delete-form'),
+            'url' => $context->toUrl('delete-form'),
             'attributes' => $this->getAjaxAttributes(),
           ],
           'disable' => [
             'title' => $context->disabled() ? $this->t('Enable') : $this->t('Disable'),
             'url' => $context->toUrl('disable-form'),
             'attributes' => $this->getAjaxAttributes(),
-          ]
+          ],
         ];
 
         $form['contexts'][$context_id] = [
@@ -212,16 +226,16 @@ class ContextListBuilder extends ConfigEntityListBuilder implements FormInterfac
       }
     }
 
-    $form['actions'] = array(
+    $form['actions'] = [
       '#type' => 'actions',
-    );
+    ];
 
     if (count($groups) > 0) {
-      $form['actions']['submit'] = array(
+      $form['actions']['submit'] = [
         '#type'        => 'submit',
         '#value'       => $this->t('Save contexts'),
         '#button_type' => 'primary',
-      );
+      ];
     }
 
     return $form;
@@ -240,7 +254,7 @@ class ContextListBuilder extends ConfigEntityListBuilder implements FormInterfac
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $contexts = $this->storage->loadMultiple(array_keys($form_state->getValue('contexts')));
 
-    /*** @var ContextInterface $context */
+    /*** @var \Drupal\context\ContextInterface $context */
     foreach ($contexts as $context_id => $context) {
       $context_values = $form_state->getValue(['contexts', $context_id]);
 
@@ -257,7 +271,7 @@ class ContextListBuilder extends ConfigEntityListBuilder implements FormInterfac
       $context->save();
     }
 
-    drupal_set_message($this->t('The context settings have been updated.'));
+    $this->messenger->addMessage($this->t('The context settings have been updated.'));
   }
 
 }
