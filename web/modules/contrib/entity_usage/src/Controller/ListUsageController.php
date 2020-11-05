@@ -2,6 +2,7 @@
 
 namespace Drupal\entity_usage\Controller;
 
+use Drupal\block_content\BlockContentInterface;
 use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Controller\ControllerBase;
@@ -13,6 +14,7 @@ use Drupal\Core\Language\LanguageInterface;
 use Drupal\Core\Link;
 use Drupal\entity_usage\EntityUsageInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Pager\PagerManagerInterface;
 
 /**
  * Controller for our pages.
@@ -60,6 +62,13 @@ class ListUsageController extends ControllerBase {
   protected $itemsPerPage;
 
   /**
+   * The pager manager.
+   *
+   * @var \Drupal\Core\Pager\PagerManagerInterface
+   */
+  protected $pagerManager;
+
+  /**
    * ListUsageController constructor.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
@@ -68,13 +77,18 @@ class ListUsageController extends ControllerBase {
    *   The entity field manager.
    * @param \Drupal\entity_usage\EntityUsageInterface $entity_usage
    *   The EntityUsage service.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   * The config factory service.
+   * @param \Drupal\Core\Pager\PagerManagerInterface $pager_manager
+   *   The pager manager.
    */
-  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityUsageInterface $entity_usage, ConfigFactoryInterface $config_factory) {
+  public function __construct(EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, EntityUsageInterface $entity_usage, ConfigFactoryInterface $config_factory, PagerManagerInterface $pager_manager) {
     $this->entityTypeManager = $entity_type_manager;
     $this->entityFieldManager = $entity_field_manager;
     $this->entityUsage = $entity_usage;
     $this->entityUsageConfig = $config_factory->get('entity_usage.settings');
     $this->itemsPerPage = $this->entityUsageConfig->get('usage_controller_items_per_page') ?: self::ITEMS_PER_PAGE_DEFAULT;
+    $this->pagerManager = $pager_manager;
   }
 
   /**
@@ -85,7 +99,8 @@ class ListUsageController extends ControllerBase {
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
       $container->get('entity_usage.usage'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('pager.manager')
     );
   }
 
@@ -120,7 +135,8 @@ class ListUsageController extends ControllerBase {
     ];
 
     $total = count($all_rows);
-    $page = pager_default_initialize($total, $this->itemsPerPage);
+    $pager = $this->pagerManager->createPager($total, $this->itemsPerPage);
+    $page = $pager->getCurrentPage();
     $page_rows = $this->getPageRows($page, $this->itemsPerPage, $entity_type, $entity_id);
     // If all rows on this page are of entities that have usage on their default
     // revision, we don't need the "Used in" column.
@@ -297,6 +313,11 @@ class ListUsageController extends ControllerBase {
   /**
    * Retrieve a link to the source entity.
    *
+   * Note that some entities are special-cased, since they don't have canonical
+   * template and aren't expected to be re-usable. For example, if the entity
+   * passed in is a paragraph or a block content, the link we produce will point
+   * to this entity's parent (host) entity instead.
+   *
    * @param \Drupal\Core\Entity\EntityInterface $source_entity
    *   The source entity.
    * @param string|null $text
@@ -307,9 +328,6 @@ class ListUsageController extends ControllerBase {
    *   A link to the entity, or its non-linked label, in case it was impossible
    *   to correctly build a link. Will return FALSE if this item should not be
    *   shown on the UI (for example when dealing with an orphan paragraph).
-   *   Note that Paragraph entities are specially treated. This function will
-   *   return the link to its parent entity, relying on the fact that paragraphs
-   *   have only one single parent and don't have canonical template.
    */
   protected function getSourceEntityLink(EntityInterface $source_entity, $text = NULL) {
     // Note that $paragraph_entity->label() will return a string of type:
@@ -324,8 +342,13 @@ class ListUsageController extends ControllerBase {
       $rel = 'canonical';
     }
 
+    // Block content likely used in Layout Builder inline blocks.
+    if ($source_entity instanceof BlockContentInterface && !$source_entity->isReusable()) {
+      $rel = NULL;
+    }
+
+    $link_text = $text ?: $entity_label;
     if ($rel) {
-      $link_text = $text ?: $entity_label;
       // Prevent 404s by exposing the text unlinked if the user has no access
       // to view the entity.
       return $source_entity->access('view') ? $source_entity->toLink($link_text, $rel) : $link_text;
@@ -336,43 +359,31 @@ class ListUsageController extends ControllerBase {
     // we will use the link to the parent's entity label instead.
     /** @var \Drupal\paragraphs\ParagraphInterface $source_entity */
     if ($source_entity->getEntityTypeId() == 'paragraph') {
-      // Paragraph items may be legitimately orphan, so even if this is a real
-      // usage, we will only show it on the UI if its parent is loadable and
-      // references the paragraph on its default revision.
-      // @todo This could probably be simplified once #2954039 lands.
       $parent = $source_entity->getParentEntity();
-      if (empty($parent)) {
-        $orphan = TRUE;
+      if ($parent) {
+        return $this->getSourceEntityLink($parent, $link_text);
       }
-      else {
-        $parent_field = $source_entity->get('parent_field_name')->value;
-        /** @var \Drupal\entity_reference_revisions\EntityReferenceRevisionsFieldItemList $values */
-        $values = $parent->{$parent_field};
-        if (empty($values->getValue())) {
-          // The field is empty or was removed.
-          $orphan = TRUE;
-        }
-        else {
-          // There are values in the field. Once paragraphs can have just been
-          // re-ordered, there is no other option apart from looping through all
-          // values and checking if any of them is this entity.
-          $orphan = TRUE;
-          foreach ($values as $value) {
-            if ($value->entity->id() == $source_entity->id()) {
-              $orphan = FALSE;
-              break;
-            }
-          }
+    }
+    // Treat block_content entities in a special manner. Block content
+    // relationships are stored as serialized data on the host entity. This
+    // makes it difficult to query parent data. Instead we look up relationship
+    // data which may exist in entity_usage tables. This requires site builders
+    // to set up entity usage on host-entity-type -> block_content manually.
+    // @todo this could be made more generic to support other entity types with
+    // difficult to handle parent -> child relationships.
+    elseif ($source_entity->getEntityTypeId() === 'block_content') {
+      $sources = $this->entityUsage->listSources($source_entity, FALSE);
+      $source = reset($sources);
+      if ($source !== FALSE) {
+        $parent = $this->entityTypeManager()->getStorage($source['source_type'])->load($source['source_id']);
+        if ($parent) {
+          return $this->getSourceEntityLink($parent);
         }
       }
-      if ($orphan) {
-        return FALSE;
-      }
-      return $this->getSourceEntityLink($parent, $entity_label);
     }
 
     // As a fallback just return a non-linked label.
-    return $entity_label;
+    return $link_text;
   }
 
   /**
