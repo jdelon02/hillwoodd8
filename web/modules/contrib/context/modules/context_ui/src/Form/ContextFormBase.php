@@ -11,6 +11,9 @@ use Drupal\Core\Plugin\ContextAwarePluginInterface;
 use Drupal\Core\Plugin\Context\ContextRepositoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides a context form base.
+ */
 abstract class ContextFormBase extends EntityForm {
 
   /**
@@ -23,24 +26,26 @@ abstract class ContextFormBase extends EntityForm {
   /**
    * The Context module context manager.
    *
-   * @var ContextManager
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
   /**
    * The Drupal context repository.
    *
-   * @var ContextRepositoryInterface
+   * @var \Drupal\context\Entity\ContextRepositoryInterface
    */
   protected $contextRepository;
 
   /**
    * Construct a new context form.
    *
-   * @param ContextManager $contextManager
-   * @param ContextRepositoryInterface $contextRepository
+   * @param \Drupal\context\ContextManager $contextManager
+   *   The Context module context manager.
+   * @param \Drupal\context\Entity\ContextRepositoryInterface $contextRepository
+   *   The Drupal context repository.
    */
-  function __construct(ContextManager $contextManager, ContextRepositoryInterface $contextRepository) {
+  public function __construct(ContextManager $contextManager, ContextRepositoryInterface $contextRepository) {
     $this->contextManager = $contextManager;
     $this->contextRepository = $contextRepository;
   }
@@ -105,6 +110,10 @@ abstract class ContextFormBase extends EntityForm {
    * {@inheritdoc}
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
+    if ($form_state->hasValue('conditions')) {
+      $this->validateConditions($form, $form_state);
+    }
+
     if ($form_state->hasValue('reactions')) {
       $this->validateReactions($form, $form_state);
     }
@@ -142,8 +151,7 @@ abstract class ContextFormBase extends EntityForm {
    *
    * @param array $form
    *   The rendered form.
-   *
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current form state.
    */
   private function handleConditions(array &$form, FormStateInterface $form_state) {
@@ -170,8 +178,7 @@ abstract class ContextFormBase extends EntityForm {
    *
    * @param array $form
    *   The rendered form.
-   *
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current form state.
    */
   private function handleReactions(array &$form, FormStateInterface $form_state) {
@@ -188,12 +195,39 @@ abstract class ContextFormBase extends EntityForm {
   }
 
   /**
+   * Validate the condition plugins configuration forms.
+   *
+   * @param array $form
+   *   The rendered form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current form state.
+   */
+  private function validateConditions(array &$form, FormStateInterface $form_state) {
+    $conditions = $form_state->getValue('conditions', []);
+
+    // Loop trough each condition and update the configuration values by
+    // validating the conditions form.
+    foreach ($conditions as $condition_id => $configuration) {
+      $condition = $this->entity->getCondition($condition_id);
+
+      $condition_values = (new FormState())->setValues($configuration);
+      $condition->validateConfigurationForm($form, $condition_values);
+      if ($condition_values->hasAnyErrors()) {
+        // In case of errors, copy them back from the dummy FormState to the
+        // master form.
+        foreach ($condition_values->getErrors() as $element => $error) {
+          $form_state->setErrorByName("conditions][$condition_id][$element", $error);
+        }
+      }
+    }
+  }
+
+  /**
    * Validate the context reaction plugins configuration forms.
    *
    * @param array $form
    *   The rendered form.
-   *
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current form state.
    */
   private function validateReactions(array &$form, FormStateInterface $form_state) {
@@ -206,6 +240,22 @@ abstract class ContextFormBase extends EntityForm {
 
       $reaction_values = (new FormState())->setValues($configuration);
       $reaction->validateConfigurationForm($form, $reaction_values);
+
+      // Menu root should not be selected as the plugin does not exist.
+      if ($reaction_id === 'menu') {
+        $menu_items = $reaction_values->getValue('menu_items');
+        foreach ($menu_items as $menu_item) {
+          $menu = strtok($menu_item, ':');
+          $plugin_id = substr($menu_item, strlen($menu) + 1);
+
+          if (!$plugin_id) {
+            $plugin_title = $form['reactions']['reaction-menu']['options']['menu_items']['#options'][$menu_item];
+            $error = $this->t('Menu root @plugin_title cannot be selected.', ['@plugin_title' => $plugin_title]);
+            $form_state->setErrorByName("reactions][$reaction_id][$menu_item", $error);
+          }
+        }
+      }
+
       if ($reaction_values->hasAnyErrors()) {
         // In case of errors, copy them back from the dummy FormState to the
         // master form.
@@ -219,12 +269,14 @@ abstract class ContextFormBase extends EntityForm {
   /**
    * Check to see if a context already exists with the specified name.
    *
-   * @param  string $name
+   * @param string $name
    *   The machine name to check for.
    *
    * @return bool
+   *   TRUE if context exists. FALSE if context doesn't exist.
    */
   public function contextExists($name) {
     return $this->contextManager->contextExists($name);
   }
+
 }
