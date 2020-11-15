@@ -224,10 +224,10 @@ class FormatterForm extends EntityForm {
     $this->fieldFormatterManager->clearCachedDefinitions();
 
     if ($is_new) {
-      drupal_set_message($this->t('Added formatter %formatter.', ['%formatter' => $entity->label()]));
+      $this->messenger()->addStatus($this->t('Added formatter %formatter.', ['%formatter' => $entity->label()]));
     }
     else {
-      drupal_set_message($this->t('Updated formatter %formatter.', ['%formatter' => $entity->label()]));
+      $this->messenger()->addStatus($this->t('Updated formatter %formatter.', ['%formatter' => $entity->label()]));
     }
     $form_state->setRedirectUrl(new Url('entity.formatter.collection'));
   }
