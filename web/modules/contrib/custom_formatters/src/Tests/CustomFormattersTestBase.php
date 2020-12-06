@@ -119,7 +119,7 @@ abstract class CustomFormattersTestBase extends WebTestBase {
     $name = $this->randomMachineName();
     $defaults = [
       'label'       => $name,
-      'id'          => Unicode::strtolower($name),
+      'id'          => mb_strtolower($name),
       'field_types' => ['text_with_summary'],
     ];
     $values += $defaults;

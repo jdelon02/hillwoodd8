@@ -8,17 +8,25 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides a form to delete a context.
+ */
 class ContextDeleteForm extends EntityConfirmFormBase {
 
   /**
-   * @var ContextManager
+   * The Context module context manager.
+   *
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
   /**
-   * @param ContextManager $contextManager
+   * ContextDeleteForm constructor.
+   *
+   * @param \Drupal\context\ContextManager $contextManager
+   *   The Context module context manager.
    */
-  function __construct(ContextManager $contextManager) {
+  public function __construct(ContextManager $contextManager) {
     $this->contextManager = $contextManager;
   }
 
@@ -35,9 +43,9 @@ class ContextDeleteForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete the %label context?', array(
+    return $this->t('Are you sure you want to delete the %label context?', [
       '%label' => $this->entity->getLabel(),
-    ));
+    ]);
   }
 
   /**
@@ -63,17 +71,17 @@ class ContextDeleteForm extends EntityConfirmFormBase {
     return $form;
   }
 
-
   /**
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $formState) {
     $this->entity->delete();
 
-    drupal_set_message($this->t('The context %title has been deleted.', array(
+    $this->messenger()->addMessage($this->t('The context %title has been deleted.', [
       '%title' => $this->entity->getLabel(),
-    )));
+    ]));
 
     $formState->setRedirectUrl($this->getCancelUrl());
   }
+
 }
