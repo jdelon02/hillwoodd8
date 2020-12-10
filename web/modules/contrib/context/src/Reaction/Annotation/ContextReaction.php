@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\context\Reaction\Annotation\ContextReaction.
- */
-
 namespace Drupal\context\Reaction\Annotation;
 
 use Drupal\Component\Annotation\Plugin;
@@ -12,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines an context reaction annotation object.
  *
- * Plugin Namespace: Plugin\ContextReaction
+ * Plugin Namespace: Plugin\ContextReaction.
  *
  * @Annotation
  */
@@ -28,9 +23,9 @@ class ContextReaction extends Plugin {
   /**
    * The human-readable name of the context reaction.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $label;
 
@@ -39,9 +34,9 @@ class ContextReaction extends Plugin {
    *
    * This will be shown when adding or configuring this context reaction.
    *
-   * @ingroup plugin_translatable
+   * @var \Drupal\Core\Annotation\Translationoptional
    *
-   * @var \Drupal\Core\Annotation\Translation (optional)
+   * @ingroup plugin_translatable
    */
   public $description = '';
 
