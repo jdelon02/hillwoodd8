@@ -1,5 +1,5 @@
 
-# Slick Views
+## INTRODUCTION
 
 This adds two new display styles to views called:
 
@@ -14,16 +14,16 @@ want to configure your Views display using Slick carousel through the web
 interface. This ensures you can leave Views UI off once everything is setup.
 
 
-## DEPENDENCIES
+## REQUIREMENTS
 * Views (in core)
-* [Slick 2.x above](http://dgo.to/slick)
+* [Slick 2.x above](https://drupal.org/project/slick)
 
-Be sure to install the [Slick example](http://dgo.to/slick_extras) to avoid
-adventures in the first place.
+Be sure to install the [Slick example](https://drupal.org/project/slick_extras)
+to avoid adventures in the first place.
 
 
-## OPTIONSETS:
-Arm yourself with proper optionsets. To create one, go to:
+## INSTALLATION & OPTION SETS:
+Arm yourself with proper option sets. To create one, go to:
 
 **/admin/config/media/slick**
 
@@ -31,7 +31,7 @@ Be sure to install the Slick UI module first, included in the main Slick module,
 otherwise no such URL, and regular access denied error.
 
 
-## USAGE:
+## CONFIGURATION & USAGE:
 Slick Views comes with two flavors: **Slick Carousel** and **Slick Grouping**.
 
 Go to Views UI **/admin/structure/views**, add a new view, and a block.
