@@ -16,46 +16,46 @@ use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Drupal\Component\Plugin\Exception\PluginException;
-use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides the Context UI Controller.
+ */
 class ContextUIController extends ControllerBase {
 
   /**
    * The context reaction manager.
    *
-   * @var ContextReactionManager
+   * @var \Drupal\context\ContextReactionManager
    */
   protected $contextReactionManager;
 
   /**
    * The Context module context manager.
    *
-   * @var ContextManager
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
   /**
    * The Drupal core condition manager.
    *
-   * @var ConditionManager
+   * @var \Drupal\Core\Condition\ConditionManager
    */
   protected $conditionManager;
 
   /**
    * Construct a new context controller.
    *
-   * @param ContextManager $contextManager
+   * @param \Drupal\context\ContextManager $contextManager
    *   The Context module context manager.
-   *
-   * @param ContextReactionManager $contextReactionManager
+   * @param \Drupal\context\ContextReactionManager $contextReactionManager
    *   The Context module context reaction plugin manager.
-   *
-   * @param ConditionManager $conditionManager
+   * @param \Drupal\Core\Condition\ConditionManager $conditionManager
    *   The Drupal core condition manager.
    */
-  function __construct(
+  public function __construct(
     ContextManager $contextManager,
     ContextReactionManager $contextReactionManager,
     ConditionManager $conditionManager
@@ -79,10 +79,10 @@ class ContextUIController extends ControllerBase {
   /**
    * Retrieves group suggestions for a context.
    *
-   * @param Request $request
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
    *
-   * @return JsonResponse
+   * @return \Symfony\Component\HttpFoundation\JsonResponse
    *   A JSON response with groups matching the query.
    */
   public function groupsAutocomplete(Request $request) {
@@ -112,10 +112,11 @@ class ContextUIController extends ControllerBase {
   /**
    * Displays a list of conditions that can be added to the context.
    *
-   * @param ContextInterface $context
+   * @param \Drupal\context\ContextInterface $context
    *   The context to display available conditions for.
    *
    * @return array
+   *   An array with the build information.
    */
   public function listConditions(ContextInterface $context) {
 
@@ -123,7 +124,7 @@ class ContextUIController extends ControllerBase {
     $conditions = $this->conditionManager->getDefinitions();
 
     $header = [
-      $this->t('Condition')
+      $this->t('Condition'),
     ];
 
     $build['filter'] = [
@@ -163,7 +164,7 @@ class ContextUIController extends ControllerBase {
             ],
             '#options' => [
               'html' => TRUE,
-            ]
+            ],
           ],
         ],
       ];
@@ -187,10 +188,11 @@ class ContextUIController extends ControllerBase {
   /**
    * Displays a list of reactions that can be added to the context.
    *
-   * @param ContextInterface $context
-   *   The context to display available
+   * @param \Drupal\context\ContextInterface $context
+   *   The context to display available.
    *
    * @return array
+   *   An array with the build information.
    */
   public function listReactions(ContextInterface $context) {
 
@@ -198,7 +200,7 @@ class ContextUIController extends ControllerBase {
     $reactions = $this->contextReactionManager->getDefinitions();
 
     $header = [
-      $this->t('Reactions')
+      $this->t('Reactions'),
     ];
 
     $build['filter'] = [
@@ -239,7 +241,6 @@ class ContextUIController extends ControllerBase {
             '#options' => [
               'html' => TRUE,
             ],
-            '#ajax' => TRUE,
           ],
         ],
       ];
@@ -263,16 +264,15 @@ class ContextUIController extends ControllerBase {
   /**
    * Add the specified reaction to the context.
    *
-   * @param Request $request
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
-   *
-   * @param ContextInterface $context
+   * @param \Drupal\context\ContextInterface $context
    *   The context to add the reaction to.
-   *
-   * @param $reaction_id
+   * @param string $reaction_id
    *   The ID of the reaction to add.
    *
-   * @return AjaxResponse|RedirectResponse
+   * @return \Drupal\Core\Ajax\AjaxResponse|RedirectResponse
+   *   An AJAX response or a redirect response.
    */
   public function addReaction(Request $request, ContextInterface $context, $reaction_id) {
 
@@ -288,8 +288,10 @@ class ContextUIController extends ControllerBase {
       throw new HttpException(400, $e->getMessage());
     }
 
-    // If one of the condition is "Current theme", prevent adding Theme reaction.
-    // Else this will cause an infinite loop when checking for active contexts.
+    // If one of the condition is "Current theme",
+    // prevent adding Theme reaction.
+    // Else this will cause an infinite loop
+    // when checking for active contexts.
     if ($reaction_id == 'theme') {
       $conditions = $context->getConditions();
       foreach ($conditions as $condition) {
@@ -321,7 +323,7 @@ class ContextUIController extends ControllerBase {
       return $response;
     }
 
-    $url = $context->urlInfo('edit-form');
+    $url = $context->toUrl('edit-form');
 
     return $this->redirect($url->getRouteName(), $url->getRouteParameters());
   }
@@ -329,16 +331,15 @@ class ContextUIController extends ControllerBase {
   /**
    * Add the specified condition to the context.
    *
-   * @param Request $request
+   * @param \Symfony\Component\HttpFoundation\Request $request
    *   The current request.
-   *
-   * @param ContextInterface $context
+   * @param \Drupal\context\ContextInterface $context
    *   The context to add the condition to.
-   *
-   * @param $condition_id
+   * @param string $condition_id
    *   The ID of the condition to add.
    *
-   * @return AjaxResponse|RedirectResponse
+   * @return \Drupal\Core\Ajax\AjaxResponse|RedirectResponse
+   *   An AJAX response or A redirect response.
    */
   public function addCondition(Request $request, ContextInterface $context, $condition_id) {
 
@@ -354,7 +355,8 @@ class ContextUIController extends ControllerBase {
       throw new HttpException(400, $e->getMessage());
     }
 
-    // Prevent adding "Current theme" condition, if "Theme" reaction is already set.
+    // Prevent adding "Current theme" condition,
+    // if "Theme" reaction is already set.
     // Else this will cause an infinite loop when checking for active contexts.
     if ($condition_id == 'current_theme') {
       $reactions = $context->getReactions();
@@ -362,7 +364,7 @@ class ContextUIController extends ControllerBase {
         if ($reaction->getPluginId() == 'theme') {
           if ($request->isXmlHttpRequest()) {
             $response = new AjaxResponse();
-  
+
             $response->addCommand(new CloseModalDialogCommand());
             $response->addCommand(new OpenModalDialogCommand($this->t("Current theme condition"), $this->t("You can not set Current theme condition if Theme reaction is set."), ['width' => '700']));
             return $response;
@@ -387,7 +389,7 @@ class ContextUIController extends ControllerBase {
       return $response;
     }
 
-    $url = $context->urlInfo('edit-form');
+    $url = $context->toUrl('edit-form');
 
     return $this->redirect($url->getRouteName(), $url->getRouteParameters());
   }

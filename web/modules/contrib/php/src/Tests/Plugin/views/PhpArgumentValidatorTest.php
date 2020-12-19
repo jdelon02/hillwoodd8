@@ -2,7 +2,7 @@
 
 namespace Drupal\php\Tests\Plugin\views;
 
-use Drupal\views\Tests\ViewKernelTestBase;
+use Drupal\Tests\views\Kernel\ViewsKernelTestBase;
 use Drupal\views\Tests\ViewTestData;
 use Drupal\views\Views;
 
@@ -13,7 +13,7 @@ use Drupal\views\Views;
  *
  * @see \Drupal\php\Plugin\views\argument_validator\Php
  */
-class PhpArgumentValidatorTest extends ViewKernelTestBase {
+class PhpArgumentValidatorTest extends ViewsKernelTestBase {
 
   /**
    * Views used by this test.
