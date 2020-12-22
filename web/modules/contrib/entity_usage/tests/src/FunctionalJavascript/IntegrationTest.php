@@ -152,12 +152,12 @@ class IntegrationTest extends EntityUsageJavascriptTestBase {
       ],
     ])->save();
     // Define our widget and formatter for this field.
-    entity_get_form_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_nodes2', [
         'type' => 'entity_reference_autocomplete',
       ])
       ->save();
-    entity_get_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_nodes2', [
         'type' => 'entity_reference_label',
       ])
@@ -350,11 +350,11 @@ class IntegrationTest extends EntityUsageJavascriptTestBase {
       ],
     ]);
     $field->save();
-    entity_get_form_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_link1', ['type' => 'link_default'])
       ->save();
 
-    entity_get_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_link1', ['type' => 'link'])
       ->save();
 
