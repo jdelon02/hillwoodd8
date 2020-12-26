@@ -8,36 +8,43 @@ use Drupal\context\ContextInterface;
 use Drupal\Core\Ajax\ReplaceCommand;
 use Drupal\Core\Form\ConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\context\ContextReactionInterface;
 use Drupal\Core\Ajax\CloseModalDialogCommand;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\DependencyInjection\ContainerInjectionInterface;
 
+/**
+ * Provides a context reaction delete form.
+ */
 class ReactionDeleteForm extends ConfirmFormBase implements ContainerInjectionInterface {
 
   /**
-   * @var ContextInterface
+   * The Context module context manager.
+   *
+   * @var \Drupal\context\ContextInterface
    */
   protected $context;
 
   /**
-   * @var ContextReactionInterface
+   * The context reaction.
+   *
+   * @var \Drupal\context\ContextReactionInterface
    */
   protected $reaction;
 
   /**
    * The Context module context manager.
    *
-   * @var ContextManager
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
   /**
    * Construct.
    *
-   * @param ContextManager $contextManager
+   * @param \Drupal\context\ContextManager $contextManager
+   *   The Context module context manager.
    */
-  function __construct(ContextManager $contextManager) {
+  public function __construct(ContextManager $contextManager) {
     $this->contextManager = $contextManager;
   }
 
@@ -69,7 +76,7 @@ class ReactionDeleteForm extends ConfirmFormBase implements ContainerInjectionIn
    *   A URL object.
    */
   public function getCancelUrl() {
-    return $this->context->urlInfo();
+    return $this->context->toUrl();
   }
 
   /**
@@ -117,8 +124,9 @@ class ReactionDeleteForm extends ConfirmFormBase implements ContainerInjectionIn
 
     // If this is not an AJAX request then redirect and show a message.
     if (!$this->getRequest()->isXmlHttpRequest()) {
-      drupal_set_message($this->t('The %label context reaction has been removed.', [
-          '%label' => $definition['label']]
+      $this->messenger()->addMessage($this->t('The %label context reaction has been removed.', [
+        '%label' => $definition['label'],
+      ]
       ));
 
       $form_state->setRedirectUrl($this->getCancelUrl());
@@ -128,7 +136,8 @@ class ReactionDeleteForm extends ConfirmFormBase implements ContainerInjectionIn
   /**
    * Handle when the form is submitted through AJAX.
    *
-   * @return AjaxResponse
+   * @return \Drupal\Core\Ajax\AjaxResponse
+   *   An AJAX response.
    */
   public function submitFormAjax() {
     $response = new AjaxResponse();
@@ -140,4 +149,5 @@ class ReactionDeleteForm extends ConfirmFormBase implements ContainerInjectionIn
 
     return $response;
   }
+
 }
