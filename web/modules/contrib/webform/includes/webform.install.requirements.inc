@@ -13,11 +13,30 @@ use Drupal\webform\Plugin\WebformElement\ManagedFile;
  * Implements hook_requirements().
  */
 function webform_requirements($phase) {
-  if ($phase != 'runtime') {
+  if ($phase !== 'runtime') {
     return [];
   }
 
   $requirements = [];
+
+  /****************************************************************************/
+  // Contrib modules.
+  /****************************************************************************/
+
+  // Memcache API and Integration 2.2 regression.
+  if (\Drupal::moduleHandler()->moduleExists('memcache')) {
+    $info = \Drupal::service('extension.list.module')->getExtensionInfo('memcache');
+    if ($info['version'] === '8.x-2.2') {
+      $requirements['webform_memcache'] = [
+        'title' => t('Webform: Memcache API and Integration 2.2'),
+        'value' => t('Memcache API and Integration 2.2 is causing unexpected regressions for the Webform module. Please consider downgrading to <a href=":memcache_href">Memcache API and Integration 2.1 and following <a href=":issue_href">Issue #3176519: Uploaded files not linking correctly in emails sent through Webform module after upgrading to memcache 2.2</a>.', [
+          ':memcache_href' => 'https://www.drupal.org/project/memcache/releases/8.x-2.1',
+          ':issue_href' => 'https://www.drupal.org/project/memcache/issues/3176519',
+        ]),
+        'severity' => REQUIREMENT_ERROR,
+      ];
+    }
+  }
 
   /****************************************************************************/
   // Experimental modules.
@@ -28,7 +47,7 @@ function webform_requirements($phase) {
   $experimental = [];
   $enabled_modules = \Drupal::moduleHandler()->getModuleList();
   foreach ($enabled_modules as $module => $data) {
-    $info = system_get_info('module', $module);
+    $info = \Drupal::service('extension.list.module')->getExtensionInfo($module);
     if (isset($info['package']) && $info['package'] === 'Webform' && !empty($info['experimental'])) {
       $experimental[$module] = str_replace(' [EXPERIMENTAL]', '', $info['name']);
     }
@@ -48,7 +67,7 @@ function webform_requirements($phase) {
   // Check HTML email handling.
   /****************************************************************************/
 
-  /** @var \Drupal\webform\WebformEProviderInterface $email_provider */
+  /** @var \Drupal\webform\WebformEmailProviderInterface $email_provider */
   $email_provider = \Drupal::service('webform.email_provider');
   $mail_module_name = $email_provider->getModuleName();
   $mail_plugin_id = $email_provider->getMailPluginId();
@@ -57,13 +76,17 @@ function webform_requirements($phase) {
     $t_args = [
       '@module' => $mail_module_name,
       '@plugin_id' => $mail_plugin_id,
-      '@plugin_label' => $mail_plugin_definition['label'],
-      '@plugin_description' => $mail_plugin_definition['description'],
     ];
+    if ($mail_plugin_definition) {
+      $t_args += [
+        '@plugin_label' => $mail_plugin_definition['label'],
+        '@plugin_description' => $mail_plugin_definition['description'],
+      ];
+    }
     $requirements['webform_email'] = [
       'title' => t('Webform: HTML email support'),
-      'value' => ($mail_module_name) ? t('Provided by the @module module.', $t_args) : t('Provided by @plugin_id mail plugin.', $t_args),
-      'description' => new FormattableMarkup('@plugin_label: @plugin_description', $t_args),
+      'value' => ($mail_module_name) ? t('Provided by the @module module.', $t_args) : t('Provided by the @plugin_id mail plugin.', $t_args),
+      'description' => $mail_plugin_definition ? new FormattableMarkup('@plugin_label: @plugin_description', $t_args) : '',
       'severity' => REQUIREMENT_OK,
     ];
   }
@@ -108,14 +131,14 @@ function webform_requirements($phase) {
   /****************************************************************************/
 
   if (\Drupal::config('webform.settings')->get('requirements.bootstrap')) {
-    $spam_protection = FALSE;
+    $bootstrap_enabled = FALSE;
     $themes = \Drupal::service('theme_handler')->listInfo();
     foreach ($themes as $theme) {
-      if ((isset($theme->base_themes) && isset($theme->base_themes['bootstrap'])) || $theme == 'bootstrap') {
-        $spam_protection = TRUE;
+      if ((isset($theme->base_themes) && isset($theme->base_themes['bootstrap'])) || $theme === 'bootstrap') {
+        $bootstrap_enabled = TRUE;
       }
     }
-    if ($spam_protection) {
+    if ($bootstrap_enabled) {
       if (\Drupal::moduleHandler()->moduleExists('webform_bootstrap')) {
         $requirements['webform_bootstrap'] = [
           'title' => t('Webform: Bootstrap integration'),
@@ -130,6 +153,28 @@ function webform_requirements($phase) {
           'severity' => REQUIREMENT_WARNING,
         ];
       }
+    }
+  }
+
+  /****************************************************************************/
+  // Check Clientside validation module.
+  /****************************************************************************/
+
+  if (\Drupal::config('webform.settings')->get('requirements.clientside_validation')
+    && \Drupal::moduleHandler()->moduleExists('clientside_validation')) {
+    if (\Drupal::moduleHandler()->moduleExists('webform_clientside_validation')) {
+      $requirements['webform_clientside_validation'] = [
+        'title' => t('Webform: Clientside validation'),
+        'value' => t('Webform Clientside Validation module installed.'),
+      ];
+    }
+    else {
+      $requirements['webform_clientside_validation'] = [
+        'title' => t('Webform: Clientside validation'),
+        'value' => t('Webform Clientside Validation module not installed.'),
+        'description' => t('The Webform Clientside Validation module helps support Webform Clientside Validation integration. <a href=":href">Disable Webform Clientside Validation warning</a>', [':href' => Url::fromRoute('webform.config.advanced')->toString()]),
+        'severity' => REQUIREMENT_WARNING,
+      ];
     }
   }
 
