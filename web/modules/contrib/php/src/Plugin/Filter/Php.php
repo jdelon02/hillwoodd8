@@ -40,7 +40,7 @@ class Php extends FilterBase {
       $output .= '<ul><li>' . t('Remember to double-check each line for syntax and logic errors <strong>before</strong> saving.') . '</li>';
       $output .= '<li>' . t('Statements must be correctly terminated with semicolons.') . '</li>';
       $output .= '<li>' . t('Global variables used within your PHP code retain their values after your script executes.') . '</li>';
-      $output .= '<li>' . t('<code>register_globals</code> is <strong>turned off</strong>. If you need to use forms, understand and use the functions in <a href=":formapi">the Drupal Form API</a>.', [':formapi' => 'http://api.drupal.org/api/group/form_api/8']) . '</li>';
+      $output .= '<li>' . t('<code>register_globals</code> is <strong>turned off</strong>. If you need to use forms, understand and use the functions in <a href=":formapi">the Drupal Form API</a>.', [':formapi' => 'https://api.drupal.org/api/group/form_api/8']) . '</li>';
       $output .= '<li>' . t('Use a <code>print</code> or <code>return</code> statement in your code to output content.') . '</li>';
       $output .= '<li>' . t('Develop and test your PHP code using a separate test script and sample database before deploying on a production site.') . '</li>';
       $output .= '<li>' . t('Consider including your custom PHP code within a site-specific module or theme rather than embedding it directly into a post or block.') . '</li>';
@@ -60,7 +60,7 @@ class Php extends FilterBase {
     print t(\'Welcome visitor! Thank you for visiting.\');
   }
   </pre>') . '</li></ul>';
-      $output .= '<p>' . t('<a href=":drupal">Drupal.org</a> offers <a href=":php-snippets">some example PHP snippets</a>, or you can create your own with some PHP experience and knowledge of the Drupal system.', [':drupal' => 'http://drupal.org', ':php-snippets' => 'http://drupal.org/documentation/customization/php-snippets']) . '</p>';
+      $output .= '<p>' . t('<a href=":drupal">Drupal.org</a> offers <a href=":php-snippets">some example PHP snippets</a>, or you can create your own with some PHP experience and knowledge of the Drupal system.', [':drupal' => 'https://drupal.org', ':php-snippets' => 'https://drupal.org/documentation/customization/php-snippets']) . '</p>';
       return $output;
     }
     else {
