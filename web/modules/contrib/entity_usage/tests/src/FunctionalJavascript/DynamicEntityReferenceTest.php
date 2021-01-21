@@ -85,11 +85,11 @@ class DynamicEntityReferenceTest extends EntityUsageJavascriptTestBase {
       ],
     ]);
     $field->save();
-    entity_get_form_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_der1', ['type' => 'dynamic_entity_reference_default'])
       ->save();
 
-    entity_get_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_der1', ['type' => 'dynamic_entity_reference_label'])
       ->save();
 
