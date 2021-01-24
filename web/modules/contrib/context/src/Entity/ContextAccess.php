@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\context\Entity\ContextAccess.
- */
-
 namespace Drupal\context\Entity;
 
 use Drupal\Core\Entity\EntityAccessControlHandler;
@@ -42,4 +37,5 @@ class ContextAccess extends EntityAccessControlHandler implements EntityHandlerI
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     return parent::checkAccess($entity, $operation, $account);
   }
+
 }
