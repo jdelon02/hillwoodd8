@@ -24,7 +24,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ContextBlockPageVariant extends VariantBase implements PageVariantInterface, ContainerFactoryPluginInterface {
 
   /**
-   * @var ContextManager
+   * The Context module context manager.
+   *
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
@@ -43,23 +45,30 @@ class ContextBlockPageVariant extends VariantBase implements PageVariantInterfac
   protected $title = '';
 
   /**
+   * The display variant plugin manager.
+   *
+   * @var \Drupal\Core\Display\VariantManager
+   */
+  protected $displayVariant;
+
+  /**
    * Constructs a new ContextBlockPageVariant.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   *
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
-   *
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   *
-   * @param ContextManager $contextManager
+   * @param \Drupal\context\ContextManager $contextManager
    *   The context module manager.
+   * @param \Drupal\Core\Display\VariantManager $displayVariant
+   *   The variant manager.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ContextManager $contextManager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ContextManager $contextManager, VariantManager $displayVariant) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->contextManager = $contextManager;
+    $this->displayVariant = $displayVariant;
   }
 
   /**
@@ -70,7 +79,8 @@ class ContextBlockPageVariant extends VariantBase implements PageVariantInterfac
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('context.manager')
+      $container->get('context.manager'),
+      $container->get('plugin.manager.display_variant')
     );
   }
 
@@ -113,6 +123,21 @@ class ContextBlockPageVariant extends VariantBase implements PageVariantInterfac
     foreach ($this->contextManager->getActiveReactions('blocks') as $reaction) {
       if ($reaction->includeDefaultBlocks()) {
         $build = NestedArray::mergeDeep($this->getBuildFromBlockLayout(), $build);
+        // Gives the system_main block the same weight as from block layout.
+        $build['content']['#sorted'] = FALSE;
+        foreach ($build['content'] as $key => $blockId) {
+          if (isset($blockId['#plugin_id']) && $blockId['#plugin_id'] == 'system_main_block') {
+            $build['content']['system_main']['#weight'] = isset($blockId['#weight']) ? $blockId['#weight'] : 0;
+            break;
+          }
+        }
+        // Remove systems messages block if it's added via context.
+        foreach ($build as $item => $block) {
+          if (array_key_exists('system_messages_block', $block)) {
+            unset($build['content']['messages']);
+            break;
+          }
+        }
         return $build;
       }
     }
@@ -123,8 +148,7 @@ class ContextBlockPageVariant extends VariantBase implements PageVariantInterfac
    * Get build from Block layout.
    */
   private function getBuildFromBlockLayout() {
-    $plugin_manager = \Drupal::service('plugin.manager.display_variant');
-    $display_variant = $plugin_manager->createInstance('block_page', $plugin_manager->getDefinition('block_page'));
+    $display_variant = $this->displayVariant->createInstance('block_page', $this->displayVariant->getDefinition('block_page'));
     $display_variant->setTitle($this->title);
 
     return $display_variant->build();
