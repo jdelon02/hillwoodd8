@@ -29,6 +29,11 @@ class ConfigDeleteUITest extends BrowserTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -62,7 +67,7 @@ class ConfigDeleteUITest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($this->t('Configuration "automated_cron.settings" successfully deleted.'));
 
     $config = $this->config('automated_cron.settings');
-    $this->assertFalse($config->get('interval'));
+    $this->assertNull($config->get('interval'));
   }
 
   /**
@@ -85,11 +90,11 @@ class ConfigDeleteUITest extends BrowserTestBase {
     $this->assertSession()->pageTextContains($this->t('Configuration "config_delete_test.dep" and all its dependencies successfully deleted.'));
 
     $config = $this->config('config_delete_test.dep');
-    $this->assertFalse($config->get('id'));
+    $this->assertNull($config->get('id'));
     $config2 = $this->config('config_delete_test.dep2');
-    $this->assertFalse($config2->get('id'));
+    $this->assertNull($config2->get('id'));
     $config3 = $this->config('config_delete_test.dep3');
-    $this->assertFalse($config3->get('id'));
+    $this->assertNull($config3->get('id'));
   }
 
   /**
