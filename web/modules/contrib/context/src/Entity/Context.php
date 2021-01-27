@@ -89,14 +89,14 @@ class Context extends ConfigEntityBase implements ContextInterface {
   /**
    * The context conditions as a collection.
    *
-   * @var ConditionPluginCollection
+   * @var \Drupal\Core\Condition\ConditionPluginCollection
    */
   protected $conditionsCollection;
 
   /**
    * The context reactions as a collection.
    *
-   * @var ContextReactionPluginCollection
+   * @var \Drupal\context\Plugin\ContextReactionPluginCollection
    */
   protected $reactionsCollection;
 
@@ -129,8 +129,9 @@ class Context extends ConfigEntityBase implements ContextInterface {
   protected $weight = 0;
 
   /**
-   * Returns the ID of the context. The ID is the unique machine name of the
-   * context.
+   * Returns the ID of the context.
+   *
+   * The ID is the unique machine name of the context.
    */
   public function id() {
     return $this->name;
@@ -252,7 +253,7 @@ class Context extends ConfigEntityBase implements ContextInterface {
    */
   public function getConditions() {
     if (!$this->conditionsCollection) {
-      $conditionManager =  Drupal::service('plugin.manager.condition');
+      $conditionManager = Drupal::service('plugin.manager.condition');
       $this->conditionsCollection = new ConditionPluginCollection($conditionManager, $this->conditions);
     }
 
@@ -373,4 +374,5 @@ class Context extends ConfigEntityBase implements ContextInterface {
   public function disabled() {
     return $this->disabled;
   }
+
 }
