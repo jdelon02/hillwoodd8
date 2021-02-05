@@ -2,8 +2,9 @@
 
 namespace Drupal\context\Reaction\Blocks\Form;
 
-use Drupal\Core\StringTranslation\TranslatableMarkup;
-
+/**
+ * Provides a form to add a block in the Block reaction.
+ */
 class BlockAddForm extends BlockFormBase {
 
   /**
