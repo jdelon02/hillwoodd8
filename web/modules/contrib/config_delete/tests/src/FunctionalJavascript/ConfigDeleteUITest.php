@@ -24,6 +24,11 @@ class ConfigDeleteUITest extends WebDriverTestBase {
   /**
    * {@inheritdoc}
    */
+  protected $defaultTheme = 'stark';
+
+  /**
+   * {@inheritdoc}
+   */
   protected function setUp() {
     parent::setUp();
 
@@ -47,7 +52,7 @@ class ConfigDeleteUITest extends WebDriverTestBase {
 
     $this->rebuildContainer();
     $config = $this->config('contact.form.personal');
-    $this->assertFalse($config->get('id'), $config->get('id'));
+    $this->assertNull($config->get('id'));
   }
 
   /**
