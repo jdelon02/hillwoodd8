@@ -8,17 +8,25 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Entity\EntityConfirmFormBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+/**
+ * Provides a form to disable a context.
+ */
 class ContextDisableForm extends EntityConfirmFormBase {
 
   /**
-   * @var ContextManager
+   * The Context module context manager.
+   *
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
   /**
-   * @param ContextManager $contextManager
+   * The ContextDisableForm constructor.
+   *
+   * @param \Drupal\context\ContextManager $contextManager
+   *   The Context module context manager.
    */
-  function __construct(ContextManager $contextManager) {
+  public function __construct(ContextManager $contextManager) {
     $this->contextManager = $contextManager;
   }
 
@@ -35,20 +43,20 @@ class ContextDisableForm extends EntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to %status the %label context?', array(
+    return $this->t('Are you sure you want to %status the %label context?', [
       '%status' => $this->entity->disabled() ? "enable" : "disable",
       '%label' => $this->entity->getLabel(),
-    ));
+    ]);
   }
 
   /**
    * {@inheritdoc}
    */
   public function getDescription() {
-    return $this->t('This action will %status the %label context.', array(
+    return $this->t('This action will %status the %label context.', [
       '%status' => $this->entity->disabled() ? "enable" : "disable",
       '%label' => $this->entity->getLabel(),
-    ));
+    ]);
   }
 
   /**
@@ -79,11 +87,12 @@ class ContextDisableForm extends EntityConfirmFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $formState) {
     $this->entity->disable();
-    drupal_set_message($this->t('The context %title has been %status.', array(
+    $this->messenger()->addMessage($this->t('The context %title has been %status.', [
       '%title' => $this->entity->getLabel(),
       '%status' => $this->entity->disabled() ? "disabled" : "enabled",
-    )));
+    ]));
 
     $formState->setRedirectUrl($this->getCancelUrl());
   }
+
 }

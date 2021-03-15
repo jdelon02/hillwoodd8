@@ -59,7 +59,7 @@
               $row = $row[direction]();
               $cell = $row.find('td').eq(index).find(tagName);
               if ($cell.length) {
-                $cell.focus();
+                $cell.trigger('focus');
                 break;
               }
             }
@@ -81,12 +81,12 @@
               if (direction === 'next' &&
                 this.tagName === 'A' &&
                 $(this).parent('.dropbutton-action').length) {
-                $cell.find('button').focus();
+                $cell.find('button').trigger('focus');
                 event.preventDefault();
                 return;
               }
               else if (direction === 'prev' && this.tagName === 'BUTTON') {
-                $cell.find('a').focus();
+                $cell.find('a').trigger('focus');
                 event.preventDefault();
                 return;
               }
@@ -96,7 +96,7 @@
               $cell = $cell[direction]();
               $focus = $cell.find('a:visible, input:visible, select:visible');
               if ($focus.length) {
-                $focus.focus();
+                $focus.trigger('focus');
                 event.preventDefault();
                 return;
               }
@@ -104,7 +104,47 @@
           }
 
         });
+    }
+  };
 
+  /**
+   * Monitor the element's key (aka machine name).
+   *
+   * @type {Drupal~behavior}
+   */
+  Drupal.behaviors.webformUiElementKey = {
+    attach: function (context) {
+      if (!drupalSettings.webform_ui ||
+        !drupalSettings.webform_ui.reserved_keys ||
+        !$(context).find(':input[name="key"]').length) {
+        return;
+      }
+
+      // Monitor the machine name and display a warning when a reserved word is
+      // being used.
+      // There is no way to capture changes to the key val.
+      // @see core/misc/machine-name.js.
+      var currentKey;
+      setInterval(function () {
+        var value = $(':input[name="key"]').val();
+        if (value === currentKey) {
+          return;
+        }
+        currentKey = value;
+
+        if ($.inArray(value, drupalSettings.webform_ui.reserved_keys) !== -1) {
+          // Customize and display the warning message.
+          $('[data-drupal-selector="edit-key-warning"]').show();
+          $('#webform-ui-reserved-key-warning').html(
+            Drupal.t("Please avoid using the reserved word '@key' as the element's key.", {'@key': value})
+          );
+        }
+        else {
+          // Hide the warning message.
+          $('[data-drupal-selector="edit-key-warning"]').hide();
+        }
+
+      }, 300);
     }
   };
 
