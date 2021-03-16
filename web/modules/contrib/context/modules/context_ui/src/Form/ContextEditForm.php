@@ -8,6 +8,9 @@ use Drupal\context\Form\AjaxFormTrait;
 use Drupal\Component\Serialization\Json;
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Provides a form to edit context.
+ */
 class ContextEditForm extends ContextFormBase {
 
   use AjaxFormTrait;
@@ -34,9 +37,9 @@ class ContextEditForm extends ContextFormBase {
       '#suffix' => '</div>',
       '#markup' => '<h3>' . $this->t('Conditions') . '</h3>',
       '#tree' => TRUE,
-      '#process' => array(
-        array($this, 'processConditions'),
-      ),
+      '#process' => [
+        [$this, 'processConditions'],
+      ],
     ];
 
     $form['reactions'] = [
@@ -44,9 +47,9 @@ class ContextEditForm extends ContextFormBase {
       '#suffix' => '</div>',
       '#markup' => '<h3>' . $this->t('Reactions') . '</h3>',
       '#tree' => TRUE,
-      '#process' => array(
-        array($this, 'processReactions'),
-      ),
+      '#process' => [
+        [$this, 'processReactions'],
+      ],
     ];
 
     return $form;
@@ -59,12 +62,12 @@ class ContextEditForm extends ContextFormBase {
     $status = parent::save($form, $formState);
 
     if ($status) {
-      drupal_set_message($this->t('The context %label has been saved.', [
+      $this->messenger()->addMessage($this->t('The context %label has been saved.', [
         '%label' => $this->entity->getLabel(),
       ]));
     }
     else {
-      drupal_set_message($this->t('The context was not saved.'));
+      $this->messenger()->addMessage($this->t('The context was not saved.'));
     }
 
   }
@@ -72,18 +75,18 @@ class ContextEditForm extends ContextFormBase {
   /**
    * Process function for the conditions.
    *
-   * @param $element
+   * @param array $element
    *   The element to process.
-   *
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
+   *   An array with the condition element.
    */
-  public function processConditions(&$element, FormStateInterface $form_state) {
+  public function processConditions(array &$element, FormStateInterface $form_state) {
     $conditions = $this->entity->getConditions();
 
-    $element['add_condition'] = array(
+    $element['add_condition'] = [
       '#type' => 'link',
       '#title' => $this->t('Add condition'),
       '#url' => Url::fromRoute('context.conditions_library', [
@@ -91,14 +94,14 @@ class ContextEditForm extends ContextFormBase {
       ]),
       '#attributes' => [
         'class' => [
-          'use-ajax', 'button', 'button--small'
+          'use-ajax', 'button', 'button--small',
         ],
         'data-dialog-type' => 'modal',
         'data-dialog-options' => Json::encode([
           'width' => 700,
         ]),
       ],
-    );
+    ];
 
     if (!count($conditions)) {
       $element['reactions']['empty'] = [
@@ -131,7 +134,7 @@ class ContextEditForm extends ContextFormBase {
         ]),
         '#attributes' => [
           'class' => [
-            'use-ajax', 'button', 'button--small'
+            'use-ajax', 'button', 'button--small',
           ],
           'data-dialog-type' => 'modal',
           'data-dialog-options' => Json::encode([
@@ -147,15 +150,15 @@ class ContextEditForm extends ContextFormBase {
   /**
    * Process function for the reactions.
    *
-   * @param $element
+   * @param array $element
    *   The element to process.
-   *
-   * @param FormStateInterface $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current form state.
    *
    * @return array
+   *   An array with the reaction element.
    */
-  public function processReactions(&$element, FormStateInterface $form_state) {
+  public function processReactions(array &$element, FormStateInterface $form_state) {
     $reactions = $this->entity->getReactions();
 
     $element['add_reaction'] = [
@@ -166,7 +169,7 @@ class ContextEditForm extends ContextFormBase {
       ]),
       '#attributes' => [
         'class' => [
-          'use-ajax', 'button', 'button--small'
+          'use-ajax', 'button', 'button--small',
         ],
         'data-dialog-type' => 'modal',
         'data-dialog-options' => Json::encode([
@@ -209,7 +212,7 @@ class ContextEditForm extends ContextFormBase {
         ]),
         '#attributes' => [
           'class' => [
-            'use-ajax', 'button', 'button--small'
+            'use-ajax', 'button', 'button--small',
           ],
           'data-dialog-type' => 'modal',
           'data-dialog-options' => Json::encode([

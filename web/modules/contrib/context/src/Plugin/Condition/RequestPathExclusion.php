@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\context\Plugin\Condition;
 
 use Drupal\Core\Form\FormStateInterface;
@@ -11,9 +12,6 @@ use Drupal\system\Plugin\Condition\RequestPath;
  * @Condition(
  *   id = "request_path_exclusion",
  *   label = @Translation("Request path exclusion"),
- *   context = {
- *     "request_path_exclusion" = @ContextDefinition("request_path_exclusion", label = @Translation("Request path exclusion"))
- *   }
  * )
  */
 class RequestPathExclusion extends RequestPath implements ContainerFactoryPluginInterface {
@@ -31,6 +29,12 @@ class RequestPathExclusion extends RequestPath implements ContainerFactoryPlugin
    * {@inheritdoc}
    */
   public function evaluate() {
+    // Allow this to pass through gracefully when blank.
+    $pages = mb_strtolower($this->configuration['pages']);
+    if (!$pages) {
+      return TRUE;
+    }
     return !parent::evaluate();
   }
+
 }
