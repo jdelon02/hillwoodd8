@@ -66,7 +66,7 @@ class CustomFormattersSettingsForm extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    drupal_set_message($this->t('Custom Formatters settings have been updated.'));
+    $this->messenger()->addStatus($this->t('Custom Formatters settings have been updated.'));
 
     $config = $this->config('custom_formatters.settings');
     $config
