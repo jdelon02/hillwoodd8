@@ -11,6 +11,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Url;
 use Drupal\Core\Link;
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\fontawesome\FontAwesomeManagerInterface;
 
 /**
  * Plugin implementation of the 'fontawesome_icon' widget.
@@ -28,17 +29,25 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
   /**
    * Drupal configuration service container.
    *
-   * @var Drupal\Core\Config\ConfigFactory
+   * @var \Drupal\Core\Config\ConfigFactory
    */
   protected $configFactory;
 
   /**
+   * Drupal Font Awesome manager service.
+   *
+   * @var \Drupal\fontawesome\FontAwesomeManagerInterface
+   */
+  protected $fontAwesomeManager;
+
+  /**
    * {@inheritdoc}
    */
-  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ConfigFactory $config_factory) {
+  public function __construct($plugin_id, $plugin_definition, FieldDefinitionInterface $field_definition, array $settings, array $third_party_settings, ConfigFactory $config_factory, FontAwesomeManagerInterface $font_awesome_manager) {
     parent::__construct($plugin_id, $plugin_definition, $field_definition, $settings, $third_party_settings);
 
     $this->configFactory = $config_factory;
+    $this->fontAwesomeManager = $font_awesome_manager;
   }
 
   /**
@@ -51,7 +60,8 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
       $configuration['field_definition'],
       $configuration['settings'],
       $configuration['third_party_settings'],
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('fontawesome.font_awesome_manager')
     );
   }
 
@@ -106,14 +116,17 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
       '#default_value' => $items[$delta]->get('style')->getValue(),
     ];
     // Remove style options if they aren't being loaded.
-    if (!$configuration_settings->get('use_solid_file')) {
+    if (is_bool($configuration_settings->get('use_solid_file')) && !$configuration_settings->get('use_solid_file')) {
       unset($element['settings']['style']['#options']['fas']);
     }
-    if (!$configuration_settings->get('use_regular_file')) {
+    if (is_bool($configuration_settings->get('use_regular_file')) && !$configuration_settings->get('use_regular_file')) {
       unset($element['settings']['style']['#options']['far']);
     }
-    if (!$configuration_settings->get('use_light_file')) {
+    if (is_bool($configuration_settings->get('use_light_file')) && !$configuration_settings->get('use_light_file')) {
       unset($element['settings']['style']['#options']['fal']);
+    }
+    if (is_bool($configuration_settings->get('use_duotone_file')) && !$configuration_settings->get('use_duotone_file')) {
+      unset($element['settings']['style']['#options']['fad']);
     }
 
     // Allow user to determine size.
@@ -188,6 +201,14 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
         'fa-pull-right' => $this->t('Right'),
       ],
       '#default_value' => isset($iconSettings['pull']) ? $iconSettings['pull'] : '',
+    ];
+
+    // Allow to use CSS Classes for any purpose eg background color.
+    $element['settings']['additional_classes'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Additional Classes'),
+      '#default_value' => isset($iconSettings['additional_classes']) ? $iconSettings['additional_classes'] : '',
+      '#description' => $this->t('Use space separated classes for additional manual icon tagging / settings.'),
     ];
 
     // Allow user to edit duotone.
@@ -467,7 +488,7 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
     }
 
     // Load the icon data so we can check for a valid icon.
-    $iconData = fontawesome_extract_icon_metadata($value);
+    $iconData = \Drupal::service('fontawesome.font_awesome_manager')->getIconMetadata($value);
 
     if (!isset($iconData['name'])) {
       $form_state->setError($element, t("Invalid icon name %value. Please see @iconLink for correct icon names.", [
@@ -482,7 +503,7 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
    */
   public function massageFormValues(array $values, array $form, FormStateInterface $form_state) {
     // Load the icon data so we can determine the icon type.
-    $metadata = fontawesome_extract_icons();
+    $metadata = $this->fontAwesomeManager->getIcons();
 
     // Loop over each item and set the data properly.
     foreach ($values as &$item) {
@@ -492,7 +513,7 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
       }
 
       if (!empty($item['settings']['masking']['style'])) {
-        $item['settings']['masking']['style'] = isset($metadata[$item['icon_name']]['styles']) ? fontawesome_determine_prefix($metadata[$item['icon_name']]['styles'], $item['settings']['masking']['style']) : 'fas';
+        $item['settings']['masking']['style'] = isset($metadata[$item['icon_name']]['styles']) ? $this->fontAwesomeManager->determinePrefix($metadata[$item['icon_name']]['styles'], $item['settings']['masking']['style']) : 'fas';
       }
 
       // Massage rotate and flip values to make them format properly.
@@ -515,7 +536,7 @@ class FontAwesomeIconWidget extends WidgetBase implements ContainerFactoryPlugin
         unset($item['settings']['power_transforms']['flip-v']);
       }
       // Determine the icon style - brands don't allow style.
-      $item['style'] = isset($metadata[$item['icon_name']]['styles']) ? fontawesome_determine_prefix($metadata[$item['icon_name']]['styles'], $item['settings']['style']) : 'fas';
+      $item['style'] = isset($metadata[$item['icon_name']]['styles']) ? $this->fontAwesomeManager->determinePrefix($metadata[$item['icon_name']]['styles'], $item['settings']['style']) : 'fas';
       unset($item['settings']['style']);
 
       $item['settings'] = serialize(array_filter($item['settings']));
