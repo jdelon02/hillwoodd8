@@ -49,14 +49,14 @@ class SimpleBlockEditForm extends EntityForm implements ContainerInjectionInterf
       '#description' => $this->t("The block title."),
       '#required' => TRUE,
     ];
-    $form['content'] = array(
+    $form['content'] = [
       '#type' => 'text_format',
       '#format' => $simple_block->getContent()['format'],
       '#title' => $this->t('Block content'),
       '#default_value' => $simple_block->getContent()['value'],
       '#description' => $this->t("The block content."),
       '#required' => TRUE,
-    );
+    ];
     return $form;
   }
 
@@ -64,7 +64,15 @@ class SimpleBlockEditForm extends EntityForm implements ContainerInjectionInterf
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $this->entity->save();
+    $status = parent::save($form, $form_state);
+    $messenger = $this->messenger();
+    $arguments = ['%id' => $this->getEntity()->id()];
+    if ($status === SAVED_NEW) {
+      $messenger->addStatus($this->t('Block %id has been added.', $arguments));
+    }
+    elseif ($status === SAVED_UPDATED) {
+      $messenger->addStatus($this->t('Block %id has been updated.', $arguments));
+    }
   }
 
 }
