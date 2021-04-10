@@ -220,7 +220,7 @@ class Fixer
      * @param string  $filePath Optional file path to diff the file against.
      *                          If not specified, the original version of the
      *                          file will be used.
-     * @param boolean $colors   Print colored output or not.
+     * @param boolean $colors   Print coloured output or not.
      *
      * @return string
      */
@@ -253,6 +253,10 @@ class Fixer
         fclose($fixedFile);
         if (is_file($tempName) === true) {
             unlink($tempName);
+        }
+
+        if ($diff === null) {
+            return '';
         }
 
         if ($colors === false) {
@@ -743,7 +747,7 @@ class Fixer
      * @param int $change The number of spaces to adjust the indent by
      *                    (positive or negative).
      *
-     * @return bool If the change was accepted.
+     * @return void
      */
     public function changeCodeBlockIndent($start, $end, $change)
     {
