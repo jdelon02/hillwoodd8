@@ -34,24 +34,53 @@ function fontawesome_menu_icons_form_menu_link_content_form_alter(&$form, FormSt
   $menu_link_options = $menu_link->link->first()->options ?: [];
 
   $form['fa_icon'] = [
-    '#type' => 'textfield',
+    '#type'  => 'fieldset',
     '#title' => t('FontAwesome Icon'),
+  ];
+
+  $form['fa_icon']['fa_icon'] = [
+    '#type'          => 'textfield',
+    '#title'         => t('Icon'),
     '#default_value' => !empty($menu_link_options['fa_icon']) ? $menu_link_options['fa_icon'] : '',
-    '#attributes' => [
+    '#attributes'    => [
       'class' => [
         'fa-menu-iconpicker',
       ],
     ],
   ];
 
-  $form['fa_icon_appearance'] = [
-    '#type' => 'select',
-    '#title' => t('FontAwesome Icon - Appearance'),
+  $form['fa_icon']['fa_icon_prefix'] = [
+    '#type'          => 'select',
+    '#title'         => t('Style prefix'),
+    '#default_value' => !empty($menu_link_options['fa_icon_prefix']) ? $menu_link_options['fa_icon_prefix'] : 'fa',
+    '#options'       => [
+      'fa'  => 'fa (' . t('4.x only') . ')',
+      'fas' => 'fas (' . t('5.x only') . ')',
+      'far' => 'far (' . t('5.x only') . ')',
+      'fal' => 'fal (' . t('5.x only') . ')',
+      'fad' => 'fad (' . t('5.x only') . ')',
+      'fab' => 'fab (' . t('5.x only') . ')',
+    ],
+  ];
+
+  $form['fa_icon']['fa_icon_tag'] = [
+    '#type'          => 'select',
+    '#title'         => t('HTML tag'),
+    '#default_value' => !empty($menu_link_options['fa_icon_tag']) ? $menu_link_options['fa_icon_tag'] : 'i',
+    '#options'       => [
+      'i'    => 'i',
+      'span' => 'span',
+    ],
+  ];
+
+  $form['fa_icon']['fa_icon_appearance'] = [
+    '#type'          => 'select',
+    '#title'         => t('Appearance'),
     '#default_value' => !empty($menu_link_options['fa_icon_appearance']) ? $menu_link_options['fa_icon_appearance'] : 'before',
-    '#options' => [
+    '#options'       => [
       'before' => t('Before text'),
-      'after' => t('After text'),
-      'only' => t('Without text'),
+      'after'  => t('After text'),
+      'only'   => t('Without text'),
     ],
   ];
 
@@ -72,13 +101,19 @@ function fontawesome_menu_icons_form_menu_link_content_form_alter(&$form, FormSt
  *   Form Array.
  * @param \Drupal\Core\Form\FormStateInterface $form_state
  *   Form State Interface.
+ *
+ * @throws \Drupal\Core\Entity\EntityStorageException
  */
 function fontawesome_menu_icons_menu_link_content_form_submit(array $form, FormStateInterface $form_state) {
   $icon_field = $form_state->getValue('fa_icon');
+  $icon_prefix = $form_state->getValue('fa_icon_prefix');
+  $icon_tag = $form_state->getValue('fa_icon_tag');
   $icon_appearance = $form_state->getValue('fa_icon_appearance');
 
   $options = [
-    'fa_icon' => !empty($icon_field) ? Html::escape($icon_field) : '',
+    'fa_icon'            => !empty($icon_field) ? Html::escape($icon_field) : '',
+    'fa_icon_prefix'     => !empty($icon_prefix) ? Html::escape($icon_prefix) : 'fa',
+    'fa_icon_tag'        => !empty($icon_tag) ? Html::escape($icon_tag) : 'i',
     'fa_icon_appearance' => !empty($icon_appearance) ? Html::escape($icon_appearance) : 'before',
   ];
 
@@ -99,24 +134,53 @@ function fontawesome_menu_icons_form_menu_link_edit_alter(&$form, FormStateInter
   $options = $form_state->getBuildInfo()['args'][0]->getOptions();
 
   $form['fa_icon'] = [
-    '#type' => 'textfield',
+    '#type'  => 'fieldset',
     '#title' => t('FontAwesome Icon'),
+  ];
+
+  $form['fa_icon']['fa_icon'] = [
+    '#type'          => 'textfield',
+    '#title'         => t('Icon'),
     '#default_value' => !empty($options['fa_icon']) ? $options['fa_icon'] : '',
-    '#attributes' => [
+    '#attributes'    => [
       'class' => [
         'fa-menu-iconpicker',
       ],
     ],
   ];
 
-  $form['fa_icon_appearance'] = [
-    '#type' => 'select',
-    '#title' => t('FontAwesome Icon - Appearance'),
+  $form['fa_icon']['fa_icon_prefix'] = [
+    '#type'          => 'select',
+    '#title'         => t('Style prefix'),
+    '#default_value' => !empty($options['fa_icon_prefix']) ? $options['fa_icon_prefix'] : 'fa',
+    '#options'       => [
+      'fa'  => 'fa (' . t('4.x only') . ')',
+      'fas' => 'fas (' . t('5.x only') . ')',
+      'far' => 'far (' . t('5.x only') . ')',
+      'fal' => 'fal (' . t('5.x only') . ')',
+      'fad' => 'fad (' . t('5.x only') . ')',
+      'fab' => 'fab (' . t('5.x only') . ')',
+    ],
+  ];
+
+  $form['fa_icon']['fa_icon_tag'] = [
+    '#type'          => 'select',
+    '#title'         => t('HTML tag'),
+    '#default_value' => !empty($options['fa_icon_tag']) ? $options['fa_icon_tag'] : 'i',
+    '#options'       => [
+      'i'    => 'i',
+      'span' => 'span',
+    ],
+  ];
+
+  $form['fa_icon']['fa_icon_appearance'] = [
+    '#type'          => 'select',
+    '#title'         => t('Appearance'),
     '#default_value' => !empty($options['fa_icon_appearance']) ? $options['fa_icon_appearance'] : 'before',
-    '#options' => [
+    '#options'       => [
       'before' => t('Before text'),
-      'after' => t('After text'),
-      'only' => t('Without text'),
+      'after'  => t('After text'),
+      'only'   => t('Without text'),
     ],
   ];
 
@@ -142,10 +206,14 @@ function fontawesome_menu_icons_form_menu_link_edit_submit(array $form, FormStat
   $options = $form_state->getBuildInfo()['args'][0]->getOptions();
   $menu_link_id = $form_state->getValue('menu_link_id');
 
-  $fa_icon = $form_state->getValue('fa_icon');
+  $icon_field = $form_state->getValue('fa_icon');
+  $icon_prefix = $form_state->getValue('fa_icon_prefix');
+  $icon_tag = $form_state->getValue('fa_icon_tag');
   $icon_appearance = $form_state->getValue('fa_icon_appearance');
 
-  $options['fa_icon'] = !empty($fa_icon) ? Html::escape($fa_icon) : '';
+  $options['fa_icon'] = !empty($icon_field) ? Html::escape($icon_field) : '';
+  $options['fa_icon_prefix'] = !empty($icon_prefix) ? Html::escape($icon_prefix) : 'fa';
+  $options['fa_icon_tag'] = !empty($icon_tag) ? Html::escape($icon_tag) : 'i';
   $options['fa_icon_appearance'] = !empty($icon_appearance) ? Html::escape($icon_appearance) : 'before';
 
   if (!empty($menu_link_id)) {
@@ -170,7 +238,9 @@ function fontawesome_menu_icons_form_menu_link_edit_submit(array $form, FormStat
     }
     else {
       $icons[$config_key] = [
-        'icon' => $options['fa_icon'],
+        'icon'       => $options['fa_icon'],
+        'prefix'     => $options['fa_icon_prefix'],
+        'tag'        => $options['fa_icon_tag'],
         'appearance' => $options['fa_icon_appearance'],
       ];
     }
@@ -202,10 +272,16 @@ function fontawesome_menu_icons_menu_links_discovered_alter(&$links) {
       // Array is the new storage format.
       if (is_array($icons[$config_key])) {
         $link['options']['fa_icon'] = !empty($icons[$config_key]['icon']) ? $icons[$config_key]['icon'] : '';
+        $link['options']['fa_icon_prefix'] = !empty($icons[$config_key]['prefix']) ? $icons[$config_key]['prefix'] : '';
+        $link['options']['fa_icon_tag'] = !empty($icons[$config_key]['tag']) ? $icons[$config_key]['tag'] : '';
         $link['options']['fa_icon_appearance'] = !empty($icons[$config_key]['appearance']) ? $icons[$config_key]['appearance'] : 'before';
-      } // BC, legacy config (when appearance was not supported).
+      }
+      // BC, legacy config
+      // (when appearance and other properties were not supported).
       else {
         $link['options']['fa_icon'] = !empty($icons[$config_key]) ? $icons[$config_key] : '';
+        $link['options']['fa_icon_prefix'] = 'fa';
+        $link['options']['fa_icon_tag'] = 'i';
         $link['options']['fa_icon_appearance'] = 'before';
       }
     }
@@ -218,7 +294,10 @@ function fontawesome_menu_icons_menu_links_discovered_alter(&$links) {
 function fontawesome_menu_icons_link_alter(&$variables) {
   if (!empty($variables['options']['fa_icon']) && empty($variables['options']['already_processed'])) {
     $class = $variables['options']['fa_icon'];
+    $prefix = !empty($variables['options']['fa_icon_prefix']) ? $variables['options']['fa_icon_prefix'] : 'fa';
+    $tag = !empty($variables['options']['fa_icon_tag']) ? $variables['options']['fa_icon_tag'] : 'i';
     $appearance = !empty($variables['options']['fa_icon_appearance']) ? $variables['options']['fa_icon_appearance'] : 'before';
+
     /** @var \Drupal\Core\Url $url */
     $url = $variables['url'];
     $is_link = ($url->isRouted() && ($url->getRouteName() == '<nolink>')) ? FALSE : TRUE;
@@ -227,10 +306,10 @@ function fontawesome_menu_icons_link_alter(&$variables) {
       case "only":
         if ($is_link) {
           $variables['options']['attributes']['aria-label'] = $variables['text'];
-          $variables['text'] = new FormattableMarkup('<i class="fa ' . $class . '" aria-hidden="true"></i>', []);
+          $variables['text'] = new FormattableMarkup('<' . $tag . ' class="' . $prefix . ' ' . $class . '" aria-hidden="true"></' . $tag . '>', []);
         }
         else {
-          $variables['text'] = new FormattableMarkup('<i class="fa ' . $class . '" aria-hidden="true" title="@title"></i><span class="sr-only">@title</span>', [
+          $variables['text'] = new FormattableMarkup('<' . $tag . ' class="' . $prefix . ' ' . $class . '" aria-hidden="true" title="@title"></' . $tag . '><span class="sr-only">@title</span>', [
             '@title' => $variables['text'],
           ]);
         }
@@ -238,14 +317,14 @@ function fontawesome_menu_icons_link_alter(&$variables) {
         break;
 
       case "after":
-        $variables['text'] = new FormattableMarkup('@title <i class="fa ' . $class . '" aria-hidden="true"></i>', [
+        $variables['text'] = new FormattableMarkup('@title <' . $tag . ' class="' . $prefix . ' ' . $class . '" aria-hidden="true"></' . $tag . '>', [
           '@title' => $variables['text'],
         ]);
         break;
 
       case "before":
       default:
-        $variables['text'] = new FormattableMarkup('<i class="fa ' . $class . '" aria-hidden="true"></i> @title', [
+        $variables['text'] = new FormattableMarkup('<' . $tag . ' class="' . $prefix . ' ' . $class . '" aria-hidden="true"></' . $tag . '> <span class="link-text">@title</span>', [
           '@title' => $variables['text'],
         ]);
         break;
@@ -264,6 +343,9 @@ function fontawesome_menu_icons_preprocess_menu(&$variables, $hook) {
   }
 }
 
+/**
+ * @param $items
+ */
 function _fontawesome_menu_icons_preprocess_menu(&$items) {
   foreach ($items as &$item) {
     if (empty($item['url'])) {
@@ -278,6 +360,9 @@ function _fontawesome_menu_icons_preprocess_menu(&$items) {
   }
 }
 
+/**
+ * @param $item
+ */
 function _fontawesome_menu_icons_preprocess_menu_item(&$item) {
   /** @var \Drupal\Core\Url $url */
   $url = $item['url'];
@@ -285,6 +370,8 @@ function _fontawesome_menu_icons_preprocess_menu_item(&$item) {
 
   if (!empty($options['fa_icon']) && empty($options['already_processed'])) {
     $class = $options['fa_icon'];
+    $prefix = !empty($options['fa_icon_prefix']) ? $options['fa_icon_prefix'] : 'fa';
+    $tag = !empty($options['fa_icon_tag']) ? $options['fa_icon_tag'] : 'i';
     $appearance = !empty($options['fa_icon_appearance']) ? $options['fa_icon_appearance'] : 'before';
     $is_link = ($url->isRouted() && ($url->getRouteName() == '<nolink>')) ? FALSE : TRUE;
 
@@ -292,24 +379,24 @@ function _fontawesome_menu_icons_preprocess_menu_item(&$item) {
       case "only":
         if ($is_link) {
           $item['attributes']['aria-label'] = $item['title'];
-          $item['title'] = new FormattableMarkup('<i class="fa ' . $class . '" aria-hidden="true"></i>', []);
+          $item['title'] = new FormattableMarkup('<' . $tag . ' class="' . $prefix . ' ' . $class . '" aria-hidden="true"></' . $tag . '>', []);
         }
         else {
-          $item['title'] = new FormattableMarkup('<i class="fa ' . $class . '" aria-hidden="true" title="@title"></i><span class="sr-only">@title</span>', [
+          $item['title'] = new FormattableMarkup('<' . $tag . ' class="' . $prefix . ' ' . $class . '" aria-hidden="true" title="@title"></' . $tag . '><span class="sr-only">@title</span>', [
             '@title' => $item['title'],
           ]);
         }
         break;
 
       case "after":
-        $item['title'] = new FormattableMarkup('@title <i class="fa ' . $class . '" aria-hidden="true"></i>', [
+        $item['title'] = new FormattableMarkup('<span class="link-text">@title</span> <' . $tag . ' class="' . $prefix . ' ' . $class . '" aria-hidden="true"></' . $tag . '>', [
           '@title' => $item['title'],
         ]);
         break;
 
       case "before":
       default:
-        $item['title'] = new FormattableMarkup('<i class="fa ' . $class . '" aria-hidden="true"></i> @title', [
+        $item['title'] = new FormattableMarkup('<' . $tag . ' class="' . $prefix . ' ' . $class . '" aria-hidden="true"></' . $tag . '> <span class="link-text">@title</span>', [
           '@title' => $item['title'],
         ]);
         break;
