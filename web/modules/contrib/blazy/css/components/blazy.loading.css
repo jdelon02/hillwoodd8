@@ -6,12 +6,15 @@
 @-webkit-keyframes rotateplane {
   0% {
     -webkit-transform: perspective(120px);
+    transform: perspective(120px);
   }
   50% {
     -webkit-transform: perspective(120px) rotateY(180deg);
+    transform: perspective(120px) rotateY(180deg);
   }
   100% {
     -webkit-transform: perspective(120px) rotateY(180deg) rotateX(180deg);
+    transform: perspective(120px) rotateY(180deg) rotateX(180deg);
   }
 }
 
@@ -27,30 +30,18 @@
   }
 }
 
-/* The lazyloaded element: IMG, IFRAME, DIV. */
-.b-lazy,
-.b-responsive {
-  display: block;
-  height: auto;
-  min-height: 1px;
-  opacity: 0;
-  transition: opacity 500ms ease-in-out;
-}
-
-/* Needed to display preloader with CSS BG image, otherwise hidden. */
-.b-loaded,
-.b-error,
-.media--loading.media--background {
-  opacity: 1;
-}
-
-.media--loading {
+/* @todo deprecated and removed media--loading for is-b-loading to make sense outside media. */
+.media--loading,
+.is-b-loading {
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
   position: relative;
+  min-height: 30px;
 }
 
-.media--loading::before {
+/* Prevents costly double animations when Blur is enabled. */
+.media--loading:not([data-animation])::before,
+.is-b-loading:not([data-animation])::before {
   content: '';
   display: block;
   width: 30px;
@@ -68,13 +59,18 @@
   animation: rotateplane 1.2s infinite ease-in-out;
 }
 
-.media--background {
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-}
-
-/** Fix for conflict with Bootstrap CSS if not using aspect ratio. */
-.blazy .media {
-  display: block;
+/**
+ * With JS being disabled, the NOSCRIPT tag is replaced by SPAN.
+ * No worries about video iframes, they are broken without JS anyway.
+ * Hide JS stuffs when being disabled. Ensures to not mess up JS users.
+ */
+.media--loading > span + .b-lazy,
+.media--loading > span + picture,
+.media--loading > span + a,
+.media--loading.media--player > span ~ .b-lazy,
+.is-b-loading > span + .b-lazy,
+.is-b-loading > span + picture,
+.is-b-loading > span + a,
+.is-b-loading.media--player > span ~ .b-lazy {
+  display: none;
 }
