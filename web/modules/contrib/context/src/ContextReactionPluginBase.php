@@ -5,6 +5,9 @@ namespace Drupal\context;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginBase;
 
+/**
+ * Provides a plugin base for Context Reactions.
+ */
 abstract class ContextReactionPluginBase extends PluginBase implements ContextReactionInterface {
 
   /**
@@ -65,4 +68,5 @@ abstract class ContextReactionPluginBase extends PluginBase implements ContextRe
   public function calculateDependencies() {
     return [];
   }
+
 }
