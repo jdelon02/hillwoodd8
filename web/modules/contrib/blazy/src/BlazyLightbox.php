@@ -20,34 +20,44 @@ class BlazyLightbox {
   public static function build(array &$element = []) {
     $item       = $element['#item'];
     $settings   = &$element['#settings'];
-    $type       = empty($settings['type']) ? 'image' : $settings['type'];
     $uri        = $settings['uri'];
     $switch     = $settings['media_switch'];
     $switch_css = str_replace('_', '-', $switch);
+    $valid      = BlazyUtil::isValidUri($uri);
 
     // Provide relevant URL if it is a lightbox.
     $url_attributes = &$element['#url_attributes'];
     $url_attributes['class'][] = 'blazy__' . $switch_css . ' litebox';
     $url_attributes['data-' . $switch_css . '-trigger'] = TRUE;
+    $element['#icon']['litebox']['#markup'] = '<span class="media__icon media__icon--litebox"></span>';
 
-    // If it is a video/audio, otherwise image to image.
+    // Gallery is determined by a view, or overriden by colorbox settings.
     $gallery_enabled = !empty($settings['view_name']);
+    $gallery_default = $gallery_enabled ? $settings['view_name'] . '-' . $settings['current_view_mode'] : 'blazy-' . $switch_css;
+
+    // Respects colorbox settings unless for an explicit view gallery.
     if (!$gallery_enabled && $switch === 'colorbox' && function_exists('colorbox_theme')) {
       $gallery_enabled = (bool) \Drupal::config('colorbox.settings')->get('custom.slideshow.slideshow');
     }
-    $gallery_id             = !$gallery_enabled ? NULL : (empty($settings['view_name']) ? 'blazy-' . $switch_css : ($settings['view_name'] . '-' . $settings['current_view_mode']));
-    $settings['gallery_id'] = !$gallery_enabled ? NULL : (empty($settings['gallery_id']) ? $gallery_id : $settings['gallery_id']);
-    $settings['box_url']    = file_create_url($uri);
-    $settings['icon']       = empty($settings['icon']) ? ['#markup' => '<span class="media__icon media__icon--litebox"></span>'] : $settings['icon'];
-    $settings['lightbox']   = $switch;
-    $settings['box_width']  = isset($item->width) ? $item->width : (empty($settings['width']) ? NULL : $settings['width']);
-    $settings['box_height'] = isset($item->height) ? $item->height : (empty($settings['height']) ? NULL : $settings['height']);
 
-    $dimensions = ['width' => $settings['box_width'], 'height' => $settings['box_height']];
-    if (!empty($settings['box_style'])) {
-      $box_style = ImageStyle::load($settings['box_style']);
-      $box_style->transformDimensions($dimensions, $uri);
-      $settings['box_url'] = $box_style->buildUrl($uri);
+    // The gallery_id might be a formatter inside a view, not aware of its view.
+    // The formatter might be duplicated on a page, although rare at production.
+    $gallery_id             = empty($settings['gallery_id']) ? $gallery_default : $settings['gallery_id'] . '-' . $gallery_default;
+    $settings['gallery_id'] = !$gallery_enabled ? NULL : str_replace('_', '-', $gallery_id);
+    $settings['box_url']    = $valid ? BlazyUtil::transformRelative($uri) : $uri;
+    $settings['box_width']  = empty($settings['width']) ? NULL : $settings['width'];
+    $settings['box_height'] = empty($settings['height']) ? NULL : $settings['height'];
+
+    $dimensions = [
+      'width' => $settings['box_width'],
+      'height' => $settings['box_height'],
+      'uri' => $uri,
+    ];
+    if (!empty($settings['box_style']) && $valid) {
+      if ($box_style = ImageStyle::load($settings['box_style'])) {
+        $dimensions = array_merge($dimensions, BlazyUtil::transformDimensions($box_style, $dimensions));
+        $settings['box_url'] = BlazyUtil::transformRelative($uri, $box_style);
+      }
     }
 
     // Allows custom work to override this without image style, such as
@@ -58,46 +68,51 @@ class BlazyLightbox {
     }
 
     $json = [
-      'type'   => $type,
       'width'  => $settings['box_width'],
       'height' => $settings['box_height'],
     ];
 
-    // This allows PhotoSwipe with videos still swipable.
-    if (!empty($settings['box_media_style'])) {
-      $box_media_style = ImageStyle::load($settings['box_media_style']);
-      $box_media_style->transformDimensions($dimensions, $uri);
-      $settings['box_media_url'] = $box_media_style->buildUrl($uri);
+    // Might not be present from BlazyFilter.
+    foreach (['bundle', 'type'] as $key) {
+      if (!empty($settings[$key])) {
+        $json[$key] = $settings[$key];
+      }
     }
 
-    if (!empty($settings['embed_url'])) {
-      $json['scheme'] = $settings['scheme'];
+    // This allows PhotoSwipe with videos still swipable.
+    if (!empty($settings['box_media_style']) && $valid) {
+      if ($box_media_style = ImageStyle::load($settings['box_media_style'])) {
+        $dimensions = array_merge($dimensions, BlazyUtil::transformDimensions($box_media_style, $dimensions));
+        $settings['box_media_url'] = BlazyUtil::transformRelative($uri, $box_media_style);
+      }
+    }
+
+    $url = $settings['box_url'];
+    $videos = ['remote_video', 'video'];
+    if (isset($json['bundle']) && in_array($json['bundle'], $videos)) {
       $json['width']  = 640;
       $json['height'] = 360;
 
       // Force autoplay for media URL on lightboxes, saving another click.
-      $url = empty($settings['autoplay_url']) ? $settings['embed_url'] : $settings['autoplay_url'];
+      if (!empty($settings['embed_url'])) {
+        $url = $settings['embed_url'];
+        $url_attributes['data-oembed-url'] = $settings['embed_url'];
 
-      // This allows PhotoSwipe with videos still swipable.
-      if (!empty($settings['box_media_style'])) {
-        $settings['box_url'] = $settings['box_media_url'];
-
-        // Allows custom work to override this video size without image style.
-        if (empty($settings['_box_width'])) {
-          $settings['box_width']  = $dimensions['width'];
-          $settings['box_height'] = $dimensions['height'];
+        // This allows PhotoSwipe with remote videos still swipable.
+        if (!empty($settings['box_media_url'])) {
+          $settings['box_url'] = $settings['box_media_url'];
         }
 
-        $json['width']  = $settings['box_width'];
-        $json['height'] = $settings['box_height'];
+        if ($switch == 'photobox') {
+          $url_attributes['rel'] = 'video';
+        }
       }
 
-      if ($switch == 'photobox') {
-        $url_attributes['rel'] = 'video';
+      // Remote or local videos.
+      if (!empty($settings['box_media_url'])) {
+        $json['width'] = $settings['box_width']  = $dimensions['width'];
+        $json['height'] = $settings['box_height'] = $dimensions['height'];
       }
-    }
-    else {
-      $url = $settings['box_url'];
     }
 
     if ($switch == 'colorbox') {
@@ -106,9 +121,24 @@ class BlazyLightbox {
       // Must use consistent key for multiple entities, hence cannot use id.
       // We do not have option for this like colorbox, as it is only limited
       // to the known Blazy formatters, or Blazy Views style plugins for now.
-      // The hustle is Colorbox uses rel on individual item to group, unlike
+      // The hustle is Colorbox wants rel on individual item to group, unlike
       // other lightbox library which provides a way to just use a container.
       $json['rel'] = $settings['gallery_id'];
+    }
+
+    // @todo make is flexible for regular non-media HTML.
+    if (!empty($element['#lightbox_html'])) {
+      $pad = round((($json['height'] / $json['width']) * 100), 2);
+      $content = [
+        '#theme' => 'container',
+        '#children' => $element['#lightbox_html'],
+        '#attributes' => [
+          'class' => ['media', 'media--ratio'],
+          'style' => 'width:' . $json['width'] . 'px; padding-bottom: ' . $pad . '%;',
+        ],
+      ];
+      $json['html'] = \blazy()->getRenderer()->renderPlain($content);
+      unset($element['#lightbox_html']);
     }
 
     $url_attributes['data-media'] = Json::encode($json);
@@ -131,7 +161,7 @@ class BlazyLightbox {
    * @return array
    *   The renderable array of caption, or empty array.
    */
-  public static function buildCaptions($item, array $settings = []) {
+  private static function buildCaptions($item, array $settings = []) {
     $title   = empty($item->title) ? '' : $item->title;
     $alt     = empty($item->alt) ? '' : $item->alt;
     $delta   = empty($settings['delta']) ? 0 : $settings['delta'];
@@ -165,7 +195,10 @@ class BlazyLightbox {
         $caption = '';
         if (!empty($settings['box_caption_custom']) && ($entity = $item->getEntity())) {
           $options = ['clear' => TRUE];
-          $caption = \Drupal::token()->replace($settings['box_caption_custom'], [$entity->getEntityTypeId() => $entity, 'file' => $item], $options);
+          $caption = \Drupal::token()->replace($settings['box_caption_custom'], [
+            $entity->getEntityTypeId() => $entity,
+            'file' => $item,
+          ], $options);
 
           // Checks for multi-value text fields, and maps its delta to image.
           if (!empty($caption) && strpos($caption, ", <p>") !== FALSE) {
@@ -177,7 +210,9 @@ class BlazyLightbox {
         break;
     }
 
-    return empty($caption) ? [] : ['#markup' => Xss::filter($caption, BlazyDefault::TAGS)];
+    return empty($caption)
+      ? []
+      : ['#markup' => Xss::filter($caption, BlazyDefault::TAGS)];
   }
 
 }
