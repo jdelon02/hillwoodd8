@@ -4,6 +4,9 @@ namespace Drupal\context_ui\Form;
 
 use Drupal\Core\Form\FormStateInterface;
 
+/**
+ * Provides a form to add a context.
+ */
 class ContextAddForm extends ContextFormBase {
 
   /**
@@ -13,12 +16,12 @@ class ContextAddForm extends ContextFormBase {
     $status = parent::save($form, $formState);
 
     if ($status) {
-      drupal_set_message($this->t('The context %label has been added.', [
+      $this->messenger()->addMessage($this->t('The context %label has been added.', [
         '%label' => $this->entity->getLabel(),
       ]));
     }
     else {
-      drupal_set_message($this->t('The context was not saved.'));
+      $this->messenger()->addMessage($this->t('The context was not saved.'));
     }
 
     $formState->setRedirect('entity.context.edit_form', [
@@ -27,4 +30,3 @@ class ContextAddForm extends ContextFormBase {
   }
 
 }
-

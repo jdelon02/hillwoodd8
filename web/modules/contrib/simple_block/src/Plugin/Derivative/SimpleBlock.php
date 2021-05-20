@@ -43,12 +43,12 @@ class SimpleBlock extends DeriverBase implements ContainerDeriverInterface {
    * {@inheritdoc}
    */
   public function getDerivativeDefinitions($base_plugin_definition) {
-    /** @var $simple_block \Drupal\simple_block\Entity\SimpleBlock */
+    /** @var \Drupal\simple_block\Entity\SimpleBlock $simple_block */
     foreach ($this->blockConfigStorage->loadMultiple() as $simple_block) {
       $this->derivatives[$simple_block->id()] = $base_plugin_definition;
       $this->derivatives[$simple_block->id()]['admin_label'] = $simple_block->label();
       $this->derivatives[$simple_block->id()]['config_dependencies'][$simple_block->getConfigDependencyKey()] = [
-        $simple_block->getConfigDependencyName()
+        $simple_block->getConfigDependencyName(),
       ];
     }
     return parent::getDerivativeDefinitions($base_plugin_definition);
