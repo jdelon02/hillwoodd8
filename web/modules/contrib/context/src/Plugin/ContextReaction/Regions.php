@@ -1,9 +1,10 @@
 <?php
+
 namespace Drupal\context\Plugin\ContextReaction;
 
+use Drupal\block\BlockRepositoryInterface;
 use Drupal\context\ContextReactionPluginBase;
 use Drupal\Core\Extension\ThemeHandlerInterface;
-use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Theme\ThemeManagerInterface;
@@ -27,11 +28,15 @@ class Regions extends ContextReactionPluginBase implements ContainerFactoryPlugi
   protected $regions = [];
 
   /**
+   * The theme manager.
+   *
    * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
+   * The handler of the available themes.
+   *
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
   protected $themeHandler;
@@ -39,7 +44,7 @@ class Regions extends ContextReactionPluginBase implements ContainerFactoryPlugi
   /**
    * {@inheritdoc}
    */
-  function __construct(
+  public function __construct(
     array $configuration,
     $pluginId,
     $pluginDefinition,
@@ -148,15 +153,15 @@ class Regions extends ContextReactionPluginBase implements ContainerFactoryPlugi
    *
    * @param string $theme
    *   The theme to get a list of regions for.
-   *
    * @param string $show
    *   What type of regions that should be returned, defaults to all regions.
    *
    * @return array
+   *   The list of available regions from a specified theme.
    *
    * @todo This could be moved to a service since we use it in a couple of places.
    */
-  protected function getSystemRegionList($theme, $show = REGIONS_ALL) {
+  protected function getSystemRegionList($theme, $show = BlockRepositoryInterface::REGIONS_ALL) {
     return system_region_list($theme, $show);
   }
 
@@ -167,4 +172,5 @@ class Regions extends ContextReactionPluginBase implements ContainerFactoryPlugi
     $configurations = $this->getConfiguration();
     return isset($configurations['regions']) ? $configurations['regions'] : [];
   }
+
 }
