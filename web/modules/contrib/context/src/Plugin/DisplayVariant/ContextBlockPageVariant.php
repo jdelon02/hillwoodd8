@@ -2,12 +2,14 @@
 
 namespace Drupal\context\Plugin\DisplayVariant;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\context\ContextManager;
 use Drupal\Core\Display\VariantBase;
 use Drupal\Core\Display\PageVariantInterface;
 use Drupal\Core\Display\VariantManager;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+use Drupal\Core\Render\BubbleableMetadata;
+use Drupal\Core\Render\Element;
+use Drupal\Core\Theme\ThemeManagerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -24,7 +26,9 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class ContextBlockPageVariant extends VariantBase implements PageVariantInterface, ContainerFactoryPluginInterface {
 
   /**
-   * @var ContextManager
+   * The Context module context manager.
+   *
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
@@ -43,23 +47,40 @@ class ContextBlockPageVariant extends VariantBase implements PageVariantInterfac
   protected $title = '';
 
   /**
+   * The display variant plugin manager.
+   *
+   * @var \Drupal\Core\Display\VariantManager
+   */
+  protected $displayVariant;
+
+  /**
+   * The theme manager.
+   *
+   * @var \Drupal\Core\Theme\ThemeManagerInterface
+   */
+  protected $themeManager;
+
+  /**
    * Constructs a new ContextBlockPageVariant.
    *
    * @param array $configuration
    *   A configuration array containing information about the plugin instance.
-   *
    * @param string $plugin_id
    *   The plugin ID for the plugin instance.
-   *
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
-   *
-   * @param ContextManager $contextManager
+   * @param \Drupal\context\ContextManager $contextManager
    *   The context module manager.
+   * @param \Drupal\Core\Display\VariantManager $displayVariant
+   *   The variant manager.
+   * @param \Drupal\Core\Theme\ThemeManagerInterface $themeManager
+   *   The Drupal theme manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ContextManager $contextManager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ContextManager $contextManager, VariantManager $displayVariant, ThemeManagerInterface $themeManager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->contextManager = $contextManager;
+    $this->displayVariant = $displayVariant;
+    $this->themeManager = $themeManager;
   }
 
   /**
@@ -70,7 +91,9 @@ class ContextBlockPageVariant extends VariantBase implements PageVariantInterfac
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('context.manager')
+      $container->get('context.manager'),
+      $container->get('plugin.manager.display_variant'),
+      $container->get('theme.manager')
     );
   }
 
@@ -109,10 +132,46 @@ class ContextBlockPageVariant extends VariantBase implements PageVariantInterfac
       $build = $reaction->execute($build, $this->title, $this->mainContent);
     }
 
-    // Execute each block reaction and check if default block should be included in page build.
+    // Execute each block reaction and check if default block should be included
+    // in page build.
     foreach ($this->contextManager->getActiveReactions('blocks') as $reaction) {
       if ($reaction->includeDefaultBlocks()) {
-        $build = NestedArray::mergeDeep($this->getBuildFromBlockLayout(), $build);
+        $build_block_layout = $this->getBuildFromBlockLayout();
+        // Only merge at block level, not underneath,
+        // else, unexpected consequences will arise.
+        $regions = $this->themeManager->getActiveTheme()->getRegions();
+        foreach ($regions as $region_key) {
+          if (empty($build[$region_key])) {
+            $build[$region_key] = [];
+          }
+          if (empty($build_block_layout[$region_key])) {
+            $build_block_layout[$region_key] = [];
+          }
+          $build[$region_key] += $build_block_layout[$region_key];
+
+        }
+        // Merge bubbleable cache data now.
+        BubbleableMetadata::createFromRenderArray($build)
+          ->merge(BubbleableMetadata::createFromRenderArray($build_block_layout))
+          ->applyTo($build);
+
+        // Remove main content as it can added from core block layout or context
+        // without the other knowing.
+        foreach (Element::children($build) as $region_key) {
+          foreach ($build[$region_key] as $blockId) {
+            if (isset($blockId['#plugin_id']) && $blockId['#plugin_id'] == 'system_main_block') {
+              unset($build['content']['system_main']);
+              break;
+            }
+          }
+        }
+        // Remove systems messages block if it's added via context.
+        foreach ($build as $block) {
+          if (array_key_exists('system_messages_block', $block)) {
+            unset($build['content']['messages']);
+            break;
+          }
+        }
         return $build;
       }
     }
@@ -123,9 +182,9 @@ class ContextBlockPageVariant extends VariantBase implements PageVariantInterfac
    * Get build from Block layout.
    */
   private function getBuildFromBlockLayout() {
-    $plugin_manager = \Drupal::service('plugin.manager.display_variant');
-    $display_variant = $plugin_manager->createInstance('block_page', $plugin_manager->getDefinition('block_page'));
+    $display_variant = $this->displayVariant->createInstance('block_page', $this->displayVariant->getDefinition('block_page'));
     $display_variant->setTitle($this->title);
+    $display_variant->setMainContent($this->mainContent);
 
     return $display_variant->build();
   }

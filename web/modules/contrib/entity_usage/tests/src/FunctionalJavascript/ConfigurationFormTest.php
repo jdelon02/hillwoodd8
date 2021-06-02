@@ -7,7 +7,7 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\media\Entity\Media;
 use Drupal\node\Entity\Node;
-use Drupal\Tests\media\Functional\MediaFunctionalTestCreateMediaTypeTrait;
+use Drupal\Tests\media\Traits\MediaTypeCreationTrait;
 
 /**
  * Tests the configuration form.
@@ -18,7 +18,7 @@ use Drupal\Tests\media\Functional\MediaFunctionalTestCreateMediaTypeTrait;
  */
 class ConfigurationFormTest extends EntityUsageJavascriptTestBase {
 
-  use MediaFunctionalTestCreateMediaTypeTrait;
+  use MediaTypeCreationTrait;
 
   /**
    * {@inheritdoc}
@@ -41,7 +41,7 @@ class ConfigurationFormTest extends EntityUsageJavascriptTestBase {
     $assert_session = $this->assertSession();
 
     // Create a media type and media asset.
-    $media_type = $this->createMediaType();
+    $media_type = $this->createMediaType('image');
     $media1 = Media::create([
       'bundle' => $media_type->id(),
       'name' => 'Target media 1',
@@ -72,12 +72,12 @@ class ConfigurationFormTest extends EntityUsageJavascriptTestBase {
       ],
     ])->save();
     // Define our widget and formatter for this field.
-    entity_get_form_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getFormDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_media', [
         'type' => 'entity_reference_autocomplete',
       ])
       ->save();
-    entity_get_display('node', 'eu_test_ct', 'default')
+    \Drupal::service('entity_display.repository')->getViewDisplay('node', 'eu_test_ct', 'default')
       ->setComponent('field_eu_test_related_media', [
         'type' => 'entity_reference_label',
       ])
