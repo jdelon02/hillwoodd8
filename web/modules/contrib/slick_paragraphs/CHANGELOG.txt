@@ -1,4 +1,8 @@
 
+Slick Paragraphs 8.x-2.0-dev, 2019-01-13
+----------------------------------------
+- Issue #3048148 by ikeigenwijs: composer needs added requirement of paragraphs.
+
 Slick Paragraphs 8.x-2.0-dev, 2019-03-01
 ----------------------------------------
 - Initial commit to integrate with core Media.
