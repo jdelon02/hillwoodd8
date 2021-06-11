@@ -1,6 +1,8 @@
+.
 ***
-
-## SUBMITTING PATCHES OR ISSUES
+***
+.
+# <a name="contribution"></a>SUBMITTING PATCHES OR ISSUES
 Please consider the following to help you explain better, and to help us
 understand better your bug reports, or patches as needed:
 
@@ -14,13 +16,13 @@ understand better your bug reports, or patches as needed:
 * If language is a barrier, use any available/ online translation tool.
 
 
-### 1. SUBMITTING ISSUES
+## 1. SUBMITTING ISSUES
 When submitting bug reports, please:
 
 * be kind with proper reproduction, and enough details.
 * mention library version, related-module version, if any, active theme, or
   anything which may help us identify issue better.
-* ensure the library is loaded, not 404.
+* ensure the library is loaded, not 404, and verify it can be viewed at browser.
 * switch to stock (Responsive) Bartik for just in case it is your custom theme.
 * switch to default formatters, image to Image, text to Default, etc.
 * use matching or similar branches or tags for related modules.
@@ -30,7 +32,7 @@ When submitting bug reports, please:
   file it under support requests.
 
 
-### 2. SUBMITTING PATCHES
+## 2. SUBMITTING PATCHES
 We consider a patch as help, they consider it a sale, so thank you in advanced!
 In order for you to help, or buy, us successfully, please consider:
 

@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\context\Plugin\ContextReaction;
 
 use Drupal\context\ContextReactionPluginBase;
@@ -19,11 +20,15 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class Theme extends ContextReactionPluginBase implements ContainerFactoryPluginInterface {
 
   /**
+   * The theme manager.
+   *
    * @var \Drupal\Core\Theme\ThemeManagerInterface
    */
   protected $themeManager;
 
   /**
+   * The handler of the available themes.
+   *
    * @var \Drupal\Core\Extension\ThemeHandlerInterface
    */
   protected $themeHandler;
@@ -31,7 +36,7 @@ class Theme extends ContextReactionPluginBase implements ContainerFactoryPluginI
   /**
    * {@inheritdoc}
    */
-  function __construct(
+  public function __construct(
     array $configuration,
     $pluginId,
     $pluginDefinition,
@@ -77,8 +82,13 @@ class Theme extends ContextReactionPluginBase implements ContainerFactoryPluginI
 
     $themes = $this->themeHandler->listInfo();
     $default_theme = $this->themeHandler->getDefault();
+    $admin_theme = \Drupal::config('system.theme')->get('admin');
 
-    $theme_options = [];
+    $theme_options = [
+      '_default' => t('Default theme (@name)', ['@name' => $this->themeHandler->getName($default_theme)]),
+      '_admin' => t('Admin theme (@name)', ['@name' => $this->themeHandler->getName($admin_theme)]),
+    ];
+
     foreach ($themes as $theme_id => $theme) {
       $theme_options[$theme_id] = $theme->info['name'];
     }
@@ -102,4 +112,5 @@ class Theme extends ContextReactionPluginBase implements ContainerFactoryPluginI
     $configuration += $this->getConfiguration();
     $this->setConfiguration($configuration);
   }
+
 }
