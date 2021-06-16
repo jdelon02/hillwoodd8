@@ -21,23 +21,19 @@ abstract class BlazyEntityBase extends EntityReferenceFormatterBase {
       static $depth = 0;
       $depth++;
       if ($depth > 20) {
-        $this->loggerFactory->get('entity')->error('Recursive rendering detected when rendering entity @entity_type @entity_id. Aborting rendering.', ['@entity_type' => $entity->getEntityTypeId(), '@entity_id' => $entity->id()]);
+        $this->loggerFactory->get('entity')->error('Recursive rendering detected when rendering entity @entity_type @entity_id. Aborting rendering.', [
+          '@entity_type' => $entity->getEntityTypeId(),
+          '@entity_id' => $entity->id(),
+        ]);
         return $build;
       }
 
       $build['settings']['delta'] = $delta;
       $build['settings']['langcode'] = $langcode;
-      if ($entity->id()) {
-        $this->buildElement($build, $entity, $langcode);
+      $this->buildElement($build, $entity, $langcode);
 
-        // Add the entity to cache dependencies so to clear when it is updated.
-        $this->formatter()->getRenderer()->addCacheableDependency($build['items'][$delta], $entity);
-      }
-      else {
-        $this->referencedEntities = NULL;
-        // This is an "auto_create" item.
-        $build['items'][$delta] = ['#markup' => $entity->label()];
-      }
+      // Add the entity to cache dependencies so to clear when it is updated.
+      $this->formatter()->getRenderer()->addCacheableDependency($build['items'][$delta], $entity);
 
       $depth = 0;
     }
@@ -67,26 +63,43 @@ abstract class BlazyEntityBase extends EntityReferenceFormatterBase {
   }
 
   /**
-   * Defines the scope for the form elements.
+   * Builds the settings.
    */
-  public function getScopedFormElements() {
-    $field       = $this->fieldDefinition;
-    $entity_type = $field->getTargetEntityTypeId();
-    $target_type = $this->getFieldSetting('target_type');
-    $views_ui    = $this->getFieldSetting('handler') == 'default';
-    $bundles     = $views_ui ? [] : $this->getFieldSetting('handler_settings')['target_bundles'];
+  public function buildSettings() {
+    $settings = array_merge($this->getCommonFieldDefinition(), $this->getSettings());
+    $settings['third_party'] = $this->getThirdPartySettings();
+    return $settings;
+  }
+
+  /**
+   * Defines the common scope for both front and admin.
+   */
+  public function getCommonFieldDefinition() {
+    $field = $this->fieldDefinition;
 
     return [
       'current_view_mode' => $this->viewMode,
-      'entity_type'       => $entity_type,
-      'field_type'        => $field->getType(),
       'field_name'        => $field->getName(),
+      'field_type'        => $field->getType(),
+      'entity_type'       => $field->getTargetEntityTypeId(),
       'plugin_id'         => $this->getPluginId(),
-      'settings'          => $this->getSettings(),
-      'target_bundles'    => $bundles,
-      'target_type'       => $target_type,
-      'view_mode'         => $this->viewMode,
+      'target_type'       => $this->getFieldSetting('target_type'),
     ];
+  }
+
+  /**
+   * Defines the scope for the form elements.
+   */
+  public function getScopedFormElements() {
+    $views_ui = $this->getFieldSetting('handler') == 'default';
+    $bundles = $views_ui ? [] : $this->getFieldSetting('handler_settings')['target_bundles'];
+
+    // @todo move common/ reusable properties somewhere.
+    return [
+      'settings'       => $this->getSettings(),
+      'target_bundles' => $bundles,
+      'view_mode'      => $this->viewMode,
+    ] + $this->getCommonFieldDefinition();
   }
 
 }
