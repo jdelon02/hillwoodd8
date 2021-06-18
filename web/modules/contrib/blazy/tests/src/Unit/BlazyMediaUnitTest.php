@@ -18,7 +18,7 @@ class BlazyMediaUnitTest extends UnitTestCase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
 
     $this->setUpVariables();
@@ -38,6 +38,8 @@ class BlazyMediaUnitTest extends UnitTestCase {
       'image_style'  => 'blazy_crop',
       'ratio'        => 'fluid',
       'view_mode'    => 'default',
+      'media_source' => 'remote_video',
+      'media_switch' => 'media',
       // @todo 'bundle' => 'entity_test',
     ];
 
