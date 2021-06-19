@@ -47,7 +47,7 @@ class Twig extends FormatterTypeBase {
       ]);
     }
     catch (Twig_Error $e) {
-      drupal_set_message($e->getMessage(), 'error');
+      $this->messenger()->addError($e->getMessage());
     }
 
     return $output;

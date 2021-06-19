@@ -1,4 +1,4 @@
-# ABOUT
+# INTRODUCTION
 
 Provides integration between Slick [1] and Paragraphs [2].
 Slick Paragraphs allows richer slideshow/ carousel contents with a mix of text,
@@ -11,8 +11,8 @@ This provides a Slick Paragraphs formatter for the Paragraphs type.
 
 
 ## REQUIREMENTS
-1. [Slick 2.x](http://dgo.to/slick)
-2. [Paragraphs](http://dgo.to/paragraphs)
+1. [Slick 2.x](https://drupal.org/project/slick)
+2. [Paragraphs](https://drupal.org/project/paragraphs)
 
 
 ## INSTALLATION
@@ -195,9 +195,8 @@ Be sure to first update Blazy and Slick Media prior to this module update.
 
 
 ## AUTHOR/MAINTAINER/CREDITS
-gausarts
-
-[Contributors](https://www.drupal.org/node/2791135/committers)
+* [Gaus Surahman](https://drupal.org/user/159062)
+* [Contributors](https://www.drupal.org/node/2791135/committers)
 
 
 ## READ MORE

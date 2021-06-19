@@ -8,13 +8,16 @@ use Drupal\Core\Form\ConfigFormBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\views\Views;
-use Drupal\Component\Utility\Unicode;
 
+/**
+ * TVI global settings form.
+ */
 class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
 
   /**
    * The config factory service.
-   * @var ConfigFactoryInterface
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
    */
   protected $configFactory;
 
@@ -27,8 +30,11 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
 
   /**
    * TaxonomyViewsIntegratorSettingsForm constructor.
-   * @param ConfigFactoryInterface $config_factory
-   * @param EntityTypeManagerInterface $entity_type_manager
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The config factory service.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
   public function __construct(ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager) {
     $this->configFactory = $config_factory;
@@ -97,8 +103,15 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
     $form['tvi'] = [
       '#type' => 'details',
       '#title' => $this->t('Global settings'),
-      '#open' => true,
-      '#description' => $this->t('By enabling taxonomy views integration here, it will apply to all vocabularies and their terms by default.')
+      '#open' => TRUE,
+      '#description' => $this->t('By enabling taxonomy views integration here, it will apply to all vocabularies and their terms by default.'),
+    ];
+
+    $form['tvi']['disable_default_view'] = [
+      '#type' => 'checkbox',
+      '#title' => $this->t("Don't display a view by default."),
+      '#description' => $this->t('Checking this field will enable the use of the selected view when displaying this taxonomy page.'),
+      '#default_value' => $config->get('disable_default_view'),
     ];
 
     $form['tvi']['enable_override'] = [
@@ -106,6 +119,11 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
       '#title' => $this->t('Use global view override.'),
       '#description' => $this->t('Checking this field will enable the use of the selected view when displaying this taxonomy page.'),
       '#default_value' => $config->get('enable_override'),
+      '#states' => [
+        'visible' => [
+          ':input[name="disable_default_view"]' => ['checked' => FALSE],
+        ],
+      ],
     ];
 
     $form['tvi']['view'] = [
@@ -116,8 +134,9 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
       '#options' => $view_options,
       '#states' => [
         'visible' => [
-          ':input[name="enable_override"]' => ['checked' => true],
-        ]
+          ':input[name="enable_override"]' => ['checked' => TRUE],
+          ':input[name="disable_default_view"]' => ['checked' => FALSE],
+        ],
       ],
       '#ajax' => [
         'callback' => '::loadDisplayOptions',
@@ -137,8 +156,9 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
       '#options' => $display_options,
       '#states' => [
         'visible' => [
-          ':input[name="enable_override"]' => ['checked' => true],
-        ]
+          ':input[name="enable_override"]' => ['checked' => TRUE],
+          ':input[name="disable_default_view"]' => ['checked' => FALSE],
+        ],
       ],
       '#prefix' => '<div id="tvi-view-display">',
       '#suffix' => '</div>',
@@ -154,11 +174,11 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
     $values = $form_state->getValues();
 
     if ($values['enable_override']) {
-      if (!Unicode::strlen($values['view'])) {
+      if (!mb_strlen($values['view'])) {
         $form_state->setError($form['tvi']['view'], $this->t('To override the term presentation, you must specify a view.'));
       }
 
-      if (!Unicode::strlen($values['view_display'])) {
+      if (!mb_strlen($values['view_display'])) {
         $form_state->setError($form['tvi']['view_display'], $this->t('To override the term presentation, you must specify a view display.'));
       }
     }
@@ -169,6 +189,7 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->config('tvi.global_settings')
+      ->set('disable_default_view', $form_state->getValue('disable_default_view'))
       ->set('enable_override', $form_state->getValue('enable_override'))
       ->set('view', $form_state->getValue('view'))
       ->set('view_display', $form_state->getValue('view_display'))
@@ -179,10 +200,14 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
 
   /**
    * Return an array of displays for a given view id.
-   * @param $view_id
+   *
+   * @param string $view_id
+   *   View id to populate options from.
+   *
    * @return array
+   *   Drupal render array options values.
    */
-  protected function getViewDisplayOptions($view_id) {
+  protected function getViewDisplayOptions(string $view_id) {
     $display_options = [];
     $view = $this->entityTypeManager->getStorage('view')->load($view_id);
 
@@ -197,10 +222,18 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
 
   /**
    * Ajax callback - null the value and return the piece of the form.
-   * The value gets nulled because we cannot overwrite #default_value in an ajax callback.
+   *
+   * The value gets nulled because we cannot overwrite #default_value in an ajax
+   * callback.
+   *
    * @param array $form
+   *   Ajax form render array.
    * @param \Drupal\Core\Form\FormStateInterface $form_state
-   * @return mixed
+   *   Submitted form state.
+   *
+   * @return array
+   *   Form render array response.
+   *
    * @see https://www.drupal.org/node/1446510
    * @see https://www.drupal.org/node/752056
    */
@@ -209,4 +242,5 @@ class TaxonomyViewsIntegratorSettingsForm extends ConfigFormBase {
     $form_state->setRebuild();
     return $form;
   }
+
 }
