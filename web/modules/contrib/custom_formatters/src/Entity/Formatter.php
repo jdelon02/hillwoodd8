@@ -28,6 +28,9 @@ use Drupal\custom_formatters\FormatterInterface;
  *     "id" = "id",
  *     "label" = "label"
  *   },
+ *   config_export = {
+ *     "id"
+ *   },
  *   links = {
  *     "delete-form" = "/admin/structure/formatters/manage/{custom_formatter}/delete",
  *     "edit-form" = "/admin/structure/formatters/manage/{custom_formatter}",
@@ -112,7 +115,9 @@ class Formatter extends ConfigEntityBase implements FormatterInterface {
   public static function postLoad(EntityStorageInterface $storage, array &$entities) {
     /** @var \Drupal\custom_formatters\FormatterInterface $entity */
     foreach ($entities as $entity) {
-      $entity->getFormatterType()->postLoad();
+      if ($entity->getFormatterType()) {
+        $entity->getFormatterType()->postLoad();
+      }
     }
     parent::postLoad($storage, $entities);
   }
@@ -121,12 +126,12 @@ class Formatter extends ConfigEntityBase implements FormatterInterface {
    * {@inheritdoc}
    */
   public function preSave(EntityStorageInterface $storage) {
-    parent::preSave($storage);
-    $this->getFormatterType()->preSave();
-
     if (!is_array($this->field_types)) {
       $this->field_types = [$this->field_types];
     }
+
+    parent::preSave($storage);
+    $this->getFormatterType()->preSave();
   }
 
   /**

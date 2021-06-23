@@ -5,36 +5,38 @@ namespace Drupal\context\Reaction\Blocks;
 use Drupal\Core\Block\BlockPluginInterface;
 use Drupal\Core\Plugin\DefaultLazyPluginCollection;
 
+/**
+ * Provide a Block collection.
+ */
 class BlockCollection extends DefaultLazyPluginCollection {
 
   /**
    * {@inheritdoc}
-   *
-   * @return BlockPluginInterface
    */
   public function &get($instance_id) {
     return parent::get($instance_id);
   }
 
   /**
-   * Returns all blocks keyed by their region. Base code from the ctools block
-   * plugin collection.
+   * Returns all blocks keyed by their region.
+   *
+   * Base code from the ctools block plugin collection.
    *
    * @param string $theme
    *   The theme to get blocks for.
    *
-   * @return BlockPluginInterface[]
+   * @return \Drupal\Core\Block\BlockPluginInterface[]
    *   An associative array keyed by region, containing an associative array of
    *   block plugins.
    */
   public function getAllByRegion($theme) {
     $region_assignments = [];
 
-    /** @var BlockPluginInterface[] $this */
+    /** @var \Drupal\Core\Block\BlockPluginInterface[] $this */
     foreach ($this as $block_id => $block) {
       $configuration = $block->getConfiguration();
 
-      if ($configuration['theme'] !== $theme) {
+      if (isset($configuration['theme']) && $configuration['theme'] !== $theme) {
         continue;
       }
 
@@ -66,4 +68,5 @@ class BlockCollection extends DefaultLazyPluginCollection {
 
     return $region_assignments;
   }
+
 }
