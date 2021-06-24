@@ -7,7 +7,6 @@ use Drupal\Core\Lock\LockBackendInterface;
 use Drupal\Core\Menu\MenuActiveTrail;
 use Drupal\Core\Menu\MenuLinkManagerInterface;
 use Drupal\Core\Routing\RouteMatchInterface;
-use Drupal\menu_link_content\Entity\MenuLinkContent;
 
 /**
  * Extend the MenuActiveTrail class.
@@ -15,7 +14,9 @@ use Drupal\menu_link_content\Entity\MenuLinkContent;
 class ContextMenuActiveTrail extends MenuActiveTrail {
 
   /**
-   * @var \Drupal\context\ContextManager.
+   * The Context module context manager.
+   *
+   * @var \Drupal\context\ContextManager
    */
   protected $contextManager;
 
@@ -27,7 +28,6 @@ class ContextMenuActiveTrail extends MenuActiveTrail {
     $this->contextManager = $context_manager;
   }
 
-
   /**
    * {@inheritdoc}
    */
@@ -35,7 +35,7 @@ class ContextMenuActiveTrail extends MenuActiveTrail {
     $found = parent::getActiveLink($menu_name);
 
     // Get active reaction of Menu type.
-    foreach($this->contextManager->getActiveReactions('menu') as $reaction) {
+    foreach ($this->contextManager->getActiveReactions('menu') as $reaction) {
       $menu_items = $reaction->execute();
       foreach ($menu_items as $menu_link_content) {
         $menu = strtok($menu_link_content, ':');

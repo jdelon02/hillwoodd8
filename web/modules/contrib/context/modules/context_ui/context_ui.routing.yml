@@ -25,6 +25,15 @@ entity.context.delete_form:
   requirements:
     _permission: 'administer contexts'
 
+# Page to duplicate a context.
+entity.context.duplicate_form:
+  path: '/admin/structure/context/{context}/duplicate'
+  defaults:
+    _entity_form: 'context.duplicate'
+    _title: 'Duplicate context'
+  requirements:
+    _permission: 'administer contexts'
+
 # Page to disable a context.
 entity.context.disable_form:
   path: '/admin/structure/context/{context}/disable'

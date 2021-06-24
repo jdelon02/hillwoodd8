@@ -22,6 +22,8 @@ abstract class TestBase extends BrowserTestBase {
   use FieldUiTestTrait;
   use TaxonomyTestTrait;
 
+  protected $defaultTheme = 'classy';
+
   /**
    * Modules to install.
    *
@@ -40,7 +42,7 @@ abstract class TestBase extends BrowserTestBase {
     'ds_test',
     'ds_switch_view_mode',
     'layout_discovery',
-    'field_group',
+    //'field_group',
   ];
 
   /**
