@@ -18,8 +18,7 @@ class SimpleBlockListBuilder extends ConfigEntityListBuilder {
   public function buildHeader() {
     return [
       'id' => $this->t('ID'),
-      'block' => $this->t('Block description'),
-
+      'block' => $this->t('Block title'),
     ] + parent::buildHeader();
   }
 
@@ -27,10 +26,10 @@ class SimpleBlockListBuilder extends ConfigEntityListBuilder {
    * {@inheritdoc}
    */
   public function buildRow(EntityInterface $entity) {
-      return [
-        'id' => $entity->id(),
-        'block' => $entity->label(),
-      ] + parent::buildRow($entity);
+    return [
+      'id' => $entity->id(),
+      'block' => $entity->label(),
+    ] + parent::buildRow($entity);
   }
 
   /**
