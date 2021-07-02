@@ -42,7 +42,6 @@ class SlickViews extends SlickViewsBase {
       if (empty($settings['vanilla']) && isset($build['items'][0])) {
         $this->blazyManager()->isBlazy($settings, $build['items'][0]);
       }
-
       // Supports Blazy multi-breakpoint images if using Blazy formatter.
       $settings['first_image'] = isset($rows[0]) ? $this->getFirstImage($rows[0]) : [];
 
