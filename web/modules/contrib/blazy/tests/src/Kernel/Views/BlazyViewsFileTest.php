@@ -57,8 +57,6 @@ class BlazyViewsFileTest extends BlazyViewsTestBase {
     $this->setUpContentTypeTest($bundle, $data);
 
     $data['settings'] = $this->getFormatterSettings();
-    $data['settings']['breakpoints'] = $this->getDataBreakpoints(TRUE);
-
     $display = $this->setUpFormatterDisplay($bundle, $data);
 
     $display->setComponent('field_image', [
@@ -123,7 +121,7 @@ class BlazyViewsFileTest extends BlazyViewsTestBase {
 
     $style_plugin->submitOptionsForm($form, $form_state);
 
-    // @todo: Fields.
+    // @todo Fields.
     $image = [];
     $index = 0;
     $row = $view->result[$index];
@@ -134,7 +132,7 @@ class BlazyViewsFileTest extends BlazyViewsTestBase {
 
     $output = $view->preview();
     $output = $this->blazyManager->getRenderer()->renderRoot($output);
-    $this->assertTrue(strpos($output, 'data-blazy') !== FALSE, 'Blazy attribute is added to DIV.');
+    $this->assertStringContainsString('data-blazy', $output);
 
     $element = ['settings' => $settings];
     $view->getStyle()->buildElement($element, $row, $index);
