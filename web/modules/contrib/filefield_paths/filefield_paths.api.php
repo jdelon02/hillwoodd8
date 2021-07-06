@@ -6,6 +6,8 @@
  */
 
 /**
+ * Form settings hook.
+ *
  * Define field(s) to be displayed on the File (Field) Paths settings form and
  * used during the processing of uploaded files.
  *
@@ -23,31 +25,21 @@
  * @see hook_filefield_paths_process_file()
  */
 function hook_filefield_paths_field_settings($field, $instance) {
-  return array(
-    'file_path' => array(
+  return [
+    'file_path' => [
       'title' => 'File path',
-      'form'  => array(
-        'value' => array(
-          '#type'             => 'textfield',
-          '#title'            => t('File path'),
-          '#maxlength'        => 512,
-          '#size'             => 128,
-          '#element_validate' => array('_file_generic_settings_file_directory_validate'),
-          '#default_value'    => $instance['settings']['file_directory'],
-        ),
-      ),
-    ),
-  );
-}
-
-/**
- * Declare a compatible field type for use with File (Field) Paths.
- *
- * @return array
- *   An array of field types.
- */
-function hook_filefield_paths_field_type_info() {
-  return array('file');
+      'form' => [
+        'value' => [
+          '#type' => 'textfield',
+          '#title' => t('File path'),
+          '#maxlength' => 512,
+          '#size' => 128,
+          '#element_validate' => ['_file_generic_settings_file_directory_validate'],
+          '#default_value' => $instance['settings']['file_directory'],
+        ],
+      ],
+    ],
+  ];
 }
 
 /**
@@ -66,7 +58,7 @@ function hook_filefield_paths_field_type_info() {
  * @param $items
  *   A pass-by-reference array of all the files for processing.
  *
- * @see filefield_paths_filefield_paths_process_file().
+ * @see filefield_paths_filefield_paths_process_file()
  */
 function hook_filefield_paths_process_file($type, $entity, $field, $instance, $langcode, &$items) {
 }
