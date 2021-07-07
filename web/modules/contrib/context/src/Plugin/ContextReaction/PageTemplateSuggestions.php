@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\context\Plugin\ContextReaction;
 
 use Drupal\context\ContextReactionPluginBase;
@@ -52,4 +53,5 @@ class PageTemplateSuggestions extends ContextReactionPluginBase {
     $config['suggestions'] = str_replace("\r\n", "\n", $form_state->getValue('suggestions'));
     $this->setConfiguration($config);
   }
+
 }
