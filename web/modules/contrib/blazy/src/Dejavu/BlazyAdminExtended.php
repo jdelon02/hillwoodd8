@@ -24,7 +24,12 @@ class BlazyAdminExtended extends BlazyAdminFormatterBase implements BlazyAdminIn
         '#weight'      => -109,
         '#enforced'    => TRUE,
         '#attributes'  => ['class' => ['form-checkbox--vanilla']],
-        '#wrapper_attributes' => ['class' => ['form-item--full', 'form-item--tooltip-bottom']],
+        '#wrapper_attributes' => [
+          'class' => [
+            'form-item--full',
+            'form-item--tooltip-bottom',
+          ],
+        ],
       ];
     }
 
@@ -47,13 +52,7 @@ class BlazyAdminExtended extends BlazyAdminFormatterBase implements BlazyAdminIn
    */
   public function fieldableForm(array &$form, $definition = []) {
     if (isset($definition['images'])) {
-      $form['image'] = [
-        '#type'        => 'select',
-        '#title'       => $this->t('Main stage'),
-        '#options'     => is_array($definition['images']) ? $definition['images'] : [],
-        '#description' => $this->t('Main background/stage image field.'),
-        '#prefix'      => '<h3 class="form__title form__title--fields">' . $this->t('Fields') . '</h3>',
-      ];
+      $form['image'] = $this->baseForm($definition)['image'];
     }
 
     if (isset($definition['thumbnails'])) {
@@ -75,11 +74,15 @@ class BlazyAdminExtended extends BlazyAdminFormatterBase implements BlazyAdminIn
     }
 
     if (isset($definition['titles'])) {
+      // Ensures to not override Views content/ entity title, just formatters.
+      if (!empty($definition['images']) && empty($definition['_views'])) {
+        $definition['titles']['title'] = $this->t('Image Title');
+      }
       $form['title'] = [
         '#type'        => 'select',
         '#title'       => $this->t('Title'),
         '#options'     => is_array($definition['titles']) ? $definition['titles'] : [],
-        '#description' => $this->t('If provided, it will bre wrapped with H2.'),
+        '#description' => $this->t('If provided, it will be wrapped with H2. Also supported the basic non-field Image title'),
       ];
     }
 
@@ -110,7 +113,7 @@ class BlazyAdminExtended extends BlazyAdminFormatterBase implements BlazyAdminIn
         '#maxlength'    => 255,
         '#field_prefix' => '#',
         '#enforced'     => TRUE,
-        '#description'  => $this->t("Manually define the container ID. <em>This ID is used for the cache identifier, so be sure it is unique</em>. Leave empty to have a guaranteed unique ID managed by the module."),
+        '#description'  => $this->t("<b>(Deprecated)</b>. Do not use this! Leave it empty, this option will be removed at future versions. It brings trouble than useful. <br>Old description: Manually define the container ID. <em>This ID is used for the cache identifier, so be sure it is unique</em>. Leave empty to have a guaranteed unique ID managed by the module, or if you see similar views while should be different."),
         '#weight'       => 94,
       ];
     }

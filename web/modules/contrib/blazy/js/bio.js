@@ -6,7 +6,7 @@
  * @see https://developers.google.com/web/updates/2016/04/intersectionobserver
  */
 
-/* global window, document, define, module */
+/* global define, module */
 (function (root, factory) {
 
   'use strict';
@@ -32,7 +32,6 @@
   /**
    * Private variables.
    */
-  var _win = window;
   var _doc = document;
   var _db = dBlazy;
   var _bioTick = 0;
@@ -71,6 +70,7 @@
   _proto._ok = 1;
   _proto.defaults = {
     root: null,
+    decode: false,
     disconnect: false,
     error: false,
     success: false,
@@ -122,7 +122,7 @@
     var me = this;
 
     // Prevents from too many revalidations unless needed.
-    if ((me.count !== me.counted || force === true) && (_revTick < me.counted)) {
+    if ((force === true || me.count !== me.counted) && (_revTick < me.counted)) {
       _disconnected = false;
       me.elms = (me.options.root || _doc).querySelectorAll(me.options.selector);
       me.observe();
@@ -179,12 +179,8 @@
   _proto.loaded = function (el, status, parent) {
     var me = this;
 
-    me[status === me._ok ? 'success' : 'error'](el, status, parent);
     el.classList.add(status === me._ok ? me.options.successClass : me.options.errorClass);
-  };
-
-  _proto.equal = function (el, str) {
-    return el.nodeName.toLowerCase() === str;
+    me[status === me._ok ? 'success' : 'error'](el, status, parent);
   };
 
   _proto.observe = function () {
@@ -268,10 +264,9 @@
       threshold: me.options.threshold
     };
 
-    me.options.selector = me.options.selector + ':not(.' + me.options.successClass + ')';
-    me.elms = (me.options.root || _doc).querySelectorAll(me.options.selector);
+    me.elms = (me.options.root || _doc).querySelectorAll(me.options.selector + ':not(.' + me.options.successClass + ')');
     me.count = me.elms.length;
-    me.windowWidth = _win.innerWidth || _doc.documentElement.clientWidth || _doc.body.clientWidth || _win.screen.width;
+    me.windowWidth = _db.windowWidth();
 
     me.prepare();
 
