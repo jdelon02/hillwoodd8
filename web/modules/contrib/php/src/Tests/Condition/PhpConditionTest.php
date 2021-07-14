@@ -41,13 +41,13 @@ class PhpConditionTest extends KernelTestBase {
     // Grab the PHP condition and configure it to check against a php snippet.
     $condition = $this->manager->createInstance('php')
       ->setConfig('php', '<?php return TRUE; ?>');
-    $this->assertTrue($condition->execute(), 'PHP condition passes as expected.');
+    $this->assertTrue((bool) $condition->execute(), 'PHP condition passes as expected.');
     // Check for the proper summary.
     self::assertEquals($condition->summary(), 'When the given PHP evaluates as TRUE.');
 
     // Set the PHP snippet to return FALSE.
     $condition->setConfig('php', '<?php return FALSE; ?>');
-    $this->assertFalse($condition->execute(), 'PHP condition fails as expected.');
+    $this->assertFalse((bool) $condition->execute(), 'PHP condition fails as expected.');
 
     // Negate the condition.
     $condition->setConfig('negate', TRUE);
