@@ -1,10 +1,5 @@
 <?php
 
-/**
- * @file
- * Contains \Drupal\filefield_paths_test\StreamWrapper\FileFieldPathsDummyReadOnlyStreamWrapper.
- */
-
 namespace Drupal\filefield_paths_test\StreamWrapper;
 
 use Drupal\Component\Utility\UrlHelper;
